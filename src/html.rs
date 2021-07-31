@@ -1,11 +1,14 @@
 #[allow(unused_imports)]
 use crate::dom::{AttrMap, Element, Node, Text};
-use combine::{error::ParseError, parser::char::{letter, newline, space}, satisfy};
-use combine::parser::char::char;
 #[allow(unused_imports)]
 use combine::EasyParser;
-use combine::{parser, Parser, Stream, many1, many, between};
-
+use combine::{between, many, many1, parser, Parser, Stream};
+use combine::{
+    error::ParseError,
+    parser::char::{letter, newline, space},
+    satisfy,
+};
+use combine::{parser::char::char, sep_by};
 
 /**
  * 属性パース
@@ -36,6 +39,22 @@ where
 }
 
 /**
+ * 属性パース(複数)
+ * @return ('attr key', 'attr value')
+ */
+fn attributes<Input>() -> impl Parser<Input, Output = AttrMap>
+where
+    Input: Stream<Token = char>,
+    Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
+{
+    sep_by::<Vec<(String, String)>, _, _, _>(
+        attribute(),
+        many::<String, _, _>(space().or(newline())),
+    )
+    .map(|attrs: Vec<(String, String)>| attrs.into_iter().collect())
+}
+
+/**
  * ====================================================
  *  unit tests
  * ====================================================
@@ -54,5 +73,18 @@ mod tests {
             attribute().easy_parse("class = \"header\""),
             Ok((("class".to_string(), "header".to_string()), ""))
         );
+    }
+
+    #[test]
+    fn test_parse_attributes() {
+        let mut expected_map = AttrMap::new();
+        expected_map.insert("class".to_string(), "foobar".to_string());
+        expected_map.insert("id".to_string(), "def".to_string());
+        assert_eq!(
+            attributes().easy_parse("class=\"foobar\" id=\"def\""),
+            Ok((expected_map, ""))
+        );
+
+        assert_eq!(attributes().easy_parse(""), Ok((AttrMap::new(), "")))
     }
 }
