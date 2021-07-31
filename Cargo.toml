@@ -5,8 +5,11 @@ authors = ["Ubugeeei"]
 edition = "2018"
 
 [[cdylib]]
+name = "html_parser_modules"
+path = "src/html_parser/mod.rs"
+[[cdylib]]
 name = "dom_definition"
-path = "src/dom.rs"
+path = "src/html_parser/dom.rs"
 [[cdylib]]
 name = "parse_attributes"
 path = "src/html_parser/parse_attributes.rs"

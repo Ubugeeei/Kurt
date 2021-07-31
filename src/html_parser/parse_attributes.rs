@@ -1,8 +1,8 @@
 #[allow(unused_imports)]
-use crate::dom::{AttrMap, Element, Node, Text};
+use crate::html_parser::dom::{AttrMap, Element, Node, Text};
 #[allow(unused_imports)]
 use combine::EasyParser;
-use combine::{between, many, many1, parser, Parser, Stream};
+use combine::{between, many, many1, Parser, Stream};
 use combine::{
     error::ParseError,
     parser::char::{letter, newline, space},
@@ -14,7 +14,7 @@ use combine::{parser::char::char, sep_by};
  * 属性パース
  * @return ('attr key', 'attr value')
  */
-fn attribute<Input>() -> impl Parser<Input, Output = (String, String)>
+pub fn attribute<Input>() -> impl Parser<Input, Output = (String, String)>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -42,7 +42,7 @@ where
  * 属性パース(複数)
  * @return ('attr key', 'attr value')
  */
-fn attributes<Input>() -> impl Parser<Input, Output = AttrMap>
+pub fn attributes<Input>() -> impl Parser<Input, Output = AttrMap>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
