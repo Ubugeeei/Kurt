@@ -1,4 +1,4 @@
-use crate::html_parser::dom::{AttrMap};
+use crate::html_parser::dom::AttrMap;
 use combine::parser::char::char;
 
 #[allow(unused_imports)]
@@ -36,6 +36,22 @@ where
     between(char('<'), char('>'), start_tag_content)
 }
 
+/**
+ * 終了タグ パース
+ */
+pub fn end_tag<Input>() -> impl Parser<Input, Output = String>
+where
+    Input: Stream<Token = char>,
+    Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
+{
+    // タグ名を読む
+    let end_tag_name = many1::<String, _, _>(letter());
+    let end_tag_content = (char('/'), end_tag_name).map(|v| v.1);
+
+    // パース
+    between(char('<'), char('>'), end_tag_content)
+}
+
 /** ====================================================
  *   unit tests
  * ====================================================
@@ -70,5 +86,11 @@ mod tests {
         {
             assert!(start_tag().easy_parse("<p id>").is_err());
         }
+    }
+
+    #[test]
+    fn test_parse_close_tag() {
+        let result = end_tag().easy_parse("</p>");
+        assert_eq!(result, Ok(("p".to_string(), "")))
     }
 }

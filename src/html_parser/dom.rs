@@ -2,10 +2,10 @@ use std::collections::HashMap;
 pub type AttrMap = HashMap<String, String>;
 
 /**
-    nodeの定義
-    node_type： Nodeの種類に応じた情報
-    children: 子Node
-*/
+ * nodeの定義
+ * node_type： Nodeの種類に応じた情報
+ * children: 子Node
+ */
 #[derive(Debug, PartialEq)]
 pub struct Node {
     pub node_type: NodeType,
@@ -13,9 +13,9 @@ pub struct Node {
 }
 
 /**
-    NodeType
-    Html要素かテキストのenumで定義
-*/
+ * NodeType
+ * Html要素かテキストのenumで定義
+ */
 #[derive(Debug, PartialEq)]
 pub enum NodeType {
     Element(Element),
@@ -23,9 +23,9 @@ pub enum NodeType {
 }
 
 /**
-    NodeTypeの一種、Elementの定義
-    タグの名前と属性(複数)を保持
-*/
+ * NodeTypeの一種、Elementの定義
+ * タグの名前と属性(複数)を保持
+ */
 #[derive(Debug, PartialEq)]
 pub struct Element {
     pub tag_name: String,
@@ -46,9 +46,9 @@ impl Element {
 }
 
 /**
-    NodeTypeの一種、Textの定義
-    タグの中の文字列。
-    内容はdataとして保持
+ * NodeTypeの一種、Textの定義
+ * タグの中の文字列。
+ * 内容はdataとして保持
 */
 #[derive(Debug, PartialEq)]
 pub struct Text {
