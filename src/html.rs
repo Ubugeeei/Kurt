@@ -46,13 +46,13 @@ mod tests {
     #[test]
     fn test_parse_attribute() {
         assert_eq!(
-            attribute().easy_parse("test=\"foobar\""),
-            Ok((("test".to_string(), "foobar".to_string()), ""))
+            attribute().easy_parse("class=\"header\""),
+            Ok((("class".to_string(), "header".to_string()), ""))
         );
 
         assert_eq!(
-            attribute().easy_parse("test = \"foobar\""),
-            Ok((("test".to_string(), "foobar".to_string()), ""))
-        )
+            attribute().easy_parse("class = \"header\""),
+            Ok((("class".to_string(), "header".to_string()), ""))
+        );
     }
 }
