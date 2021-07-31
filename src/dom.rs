@@ -13,8 +13,8 @@ pub struct Node {
 }
 
 /**
-  NodeType
-  Html要素かテキストのenumで定義
+    NodeType
+    Html要素かテキストのenumで定義
 */
 #[derive(Debug, PartialEq)]
 pub enum NodeType {
