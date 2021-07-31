@@ -1,7 +1,4 @@
-#[allow(unused_imports)]
-use crate::html_parser::dom::{AttrMap, Element, Node, Text};
-#[allow(unused_imports)]
-use combine::EasyParser;
+use crate::html_parser::dom::AttrMap;
 use combine::{between, many, many1, Parser, Stream};
 use combine::{
     error::ParseError,
@@ -10,11 +7,14 @@ use combine::{
 };
 use combine::{parser::char::char, sep_by};
 
+#[allow(unused_imports)]
+use combine::EasyParser;
+
 /**
  * 属性パース
  * @return ('attr key', 'attr value')
  */
-pub fn attribute<Input>() -> impl Parser<Input, Output = (String, String)>
+fn parse_attribute<Input>() -> impl Parser<Input, Output = (String, String)>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -42,13 +42,13 @@ where
  * 属性パース(複数)
  * @return ('attr key', 'attr value')
  */
-pub fn attributes<Input>() -> impl Parser<Input, Output = AttrMap>
+pub fn parse_attributes<Input>() -> impl Parser<Input, Output = AttrMap>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
     sep_by::<Vec<(String, String)>, _, _, _>(
-        attribute(),
+        parse_attribute(),
         many::<String, _, _>(space().or(newline())),
     )
     .map(|attrs: Vec<(String, String)>| attrs.into_iter().collect())
@@ -65,12 +65,12 @@ mod tests {
     #[test]
     fn test_parse_attribute() {
         assert_eq!(
-            attribute().easy_parse("class=\"header\""),
+            parse_attribute().easy_parse("class=\"header\""),
             Ok((("class".to_string(), "header".to_string()), ""))
         );
 
         assert_eq!(
-            attribute().easy_parse("class = \"header\""),
+            parse_attribute().easy_parse("class = \"header\""),
             Ok((("class".to_string(), "header".to_string()), ""))
         );
     }
@@ -81,10 +81,10 @@ mod tests {
         expected_map.insert("class".to_string(), "foobar".to_string());
         expected_map.insert("id".to_string(), "def".to_string());
         assert_eq!(
-            attributes().easy_parse("class=\"foobar\" id=\"def\""),
+            parse_attributes().easy_parse("class=\"foobar\" id=\"def\""),
             Ok((expected_map, ""))
         );
 
-        assert_eq!(attributes().easy_parse(""), Ok((AttrMap::new(), "")))
+        assert_eq!(parse_attributes().easy_parse(""), Ok((AttrMap::new(), "")))
     }
 }

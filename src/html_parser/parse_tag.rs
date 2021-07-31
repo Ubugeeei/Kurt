@@ -1,21 +1,21 @@
 use crate::html_parser::dom::AttrMap;
 use combine::parser::char::char;
 
-#[allow(unused_imports)]
-use combine::EasyParser;
-
 use combine::{between, many, many1, Parser, Stream};
 use combine::{
     error::ParseError,
     parser::char::{letter, newline, space},
 };
 
-use super::parse_attributes::attributes;
+#[allow(unused_imports)]
+use combine::EasyParser;
+
+use super::parse_attributes::parse_attributes;
 
 /**
  * 開始タグ パース
  */
-pub fn start_tag<Input>() -> impl Parser<Input, Output = (String, AttrMap)>
+pub fn parse_start_tag<Input>() -> impl Parser<Input, Output = (String, AttrMap)>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -28,7 +28,7 @@ where
         // 空白/改行は読み飛ばす
         many::<String, _, _>(space().or(newline())),
         // 属性を読む
-        attributes(),
+        parse_attributes(),
     )
         .map(|v: (String, _, AttrMap)| (v.0, v.2));
 
@@ -39,7 +39,7 @@ where
 /**
  * 終了タグ パース
  */
-pub fn end_tag<Input>() -> impl Parser<Input, Output = String>
+pub fn parse_end_tag<Input>() -> impl Parser<Input, Output = String>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -63,7 +63,7 @@ mod tests {
     fn test_parse_start_tag() {
         {
             assert_eq!(
-                start_tag().easy_parse("<p>aaaa"),
+                parse_start_tag().easy_parse("<p>aaaa"),
                 Ok((("p".to_string(), AttrMap::new()), "aaaa"))
             );
         }
@@ -71,12 +71,12 @@ mod tests {
             let mut attributes = AttrMap::new();
             attributes.insert("id".to_string(), "test".to_string());
             assert_eq!(
-                start_tag().easy_parse("<p id=\"test\">"),
+                parse_start_tag().easy_parse("<p id=\"test\">"),
                 Ok((("p".to_string(), attributes), ""))
             )
         }
         {
-            let result = start_tag().easy_parse("<p id=\"test\" class=\"sample\">");
+            let result = parse_start_tag().easy_parse("<p id=\"test\" class=\"sample\">");
             let mut attributes = AttrMap::new();
             attributes.insert("id".to_string(), "test".to_string());
             attributes.insert("class".to_string(), "sample".to_string());
@@ -84,13 +84,13 @@ mod tests {
         }
 
         {
-            assert!(start_tag().easy_parse("<p id>").is_err());
+            assert!(parse_start_tag().easy_parse("<p id>").is_err());
         }
     }
 
     #[test]
     fn test_parse_close_tag() {
-        let result = end_tag().easy_parse("</p>");
+        let result = parse_end_tag().easy_parse("</p>");
         assert_eq!(result, Ok(("p".to_string(), "")))
     }
 }
