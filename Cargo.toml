@@ -8,6 +8,9 @@ edition = "2018"
 name = "html_parser_modules"
 path = "src/html_parser/mod.rs"
 [[cdylib]]
+name = "parse_node"
+path = "src/html_parser/parse_node.rs"
+[[cdylib]]
 name = "dom_definition"
 path = "src/html_parser/dom.rs"
 [[cdylib]]

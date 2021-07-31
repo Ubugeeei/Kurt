@@ -10,26 +10,11 @@ use combine::EasyParser;
 use super::dom::{Element, Node, Text};
 use super::parse_tag::{parse_end_tag, parse_start_tag};
 
-pub fn nodes_<Input>() -> impl Parser<Input, Output = Vec<Box<Node>>>
-where
-    Input: Stream<Token = char>,
-    Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
-{
-    attempt(many(choice((
-        attempt(parse_element()),
-        attempt(parse_text()),
-    ))))
-}
-
-parser! {
-    fn nodes[Input]()(Input) -> Vec<Box<Node>>
-    where [Input: Stream<Token = char>]
-    {
-        nodes_()
-    }
-}
-
-pub fn parse_text<Input>() -> impl Parser<Input, Output = Box<Node>>
+/**
+ * text Nodeとしてパース
+ * htmlタグ内のテキストをパースする
+ */
+fn parse_text<Input>() -> impl Parser<Input, Output = Box<Node>>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -37,6 +22,11 @@ where
     many1(satisfy(|c: char| c != '<')).map(|t| Text::new(t))
 }
 
+/**
+ * element Nodeとしてパース
+ * @return (タグ名, 属性, 子要素)
+ * 子要素: element or text
+*/
 fn parse_element<Input>() -> impl Parser<Input, Output = Box<Node>>
 where
     Input: Stream<Token = char>,
@@ -57,6 +47,29 @@ where
             }
         },
     )
+}
+
+/**
+ * DOMツリー算出
+ * elementパース、textパースを用いてツリーを構築
+ */
+pub fn nodes_<Input>() -> impl Parser<Input, Output = Vec<Box<Node>>>
+where
+    Input: Stream<Token = char>,
+    Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
+{
+    attempt(many(choice((
+        attempt(parse_element()),
+        attempt(parse_text()),
+    ))))
+}
+
+parser! {
+    fn nodes[Input]()(Input) -> Vec<Box<Node>>
+    where [Input: Stream<Token = char>]
+    {
+        nodes_()
+    }
 }
 
 /** ====================================================
