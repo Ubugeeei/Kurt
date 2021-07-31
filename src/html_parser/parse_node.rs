@@ -27,7 +27,7 @@ where
  * @return (タグ名, 属性, 子要素)
  * 子要素: element or text
 */
-fn parse_element<Input>() -> impl Parser<Input, Output = Box<Node>>
+pub fn parse_elements<Input>() -> impl Parser<Input, Output = Box<Node>>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -59,7 +59,7 @@ where
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
     attempt(many(choice((
-        attempt(parse_element()),
+        attempt(parse_elements()),
         attempt(parse_text()),
     ))))
 }
@@ -75,21 +75,29 @@ parser! {
 /** ====================================================
  *   unit tests
  * ====================================================
- */#[cfg(test)]
+ */
+#[cfg(test)]
 mod tests {
     use crate::html_parser::dom::AttrMap;
 
     use super::*;
+    #[test]
+    fn test_parse_text() {
+        let predict = "hello".to_string();
+        let result = parse_text().easy_parse("hello").ok().unwrap();
+        dbg!(result);
+        // assert_eq!(predict, result.1);
+    }
 
     #[test]
-    fn test_parse_element() {
+    fn test_parse_elements() {
         assert_eq!(
-            parse_element().easy_parse("<p></p>"),
+            parse_elements().easy_parse("<p></p>"),
             Ok((Element::new("p".to_string(), AttrMap::new(), vec![]), ""))
         );
 
         assert_eq!(
-          parse_element().easy_parse("<p>hello world</p>"),
+            parse_elements().easy_parse("<p>hello world</p>"),
             Ok((
                 Element::new(
                     "p".to_string(),
@@ -101,7 +109,7 @@ mod tests {
         );
 
         assert_eq!(
-            parse_element().easy_parse("<div><p>hello world</p></div>"),
+            parse_elements().easy_parse("<div><p>hello world</p></div>"),
             Ok((
                 Element::new(
                     "div".to_string(),
@@ -116,7 +124,7 @@ mod tests {
             ))
         );
 
-        assert!(parse_element().easy_parse("<p>hello world</div>").is_err());
+        assert!(parse_elements().easy_parse("<p>hello world</div>").is_err());
     }
 
     /* ... */
