@@ -1,11 +1,12 @@
 use crate::html_parser::dom::AttrMap;
-use combine::{between, many, many1, Parser, Stream};
 use combine::{
+    between,
     error::ParseError,
+    many, many1,
+    parser::char::char,
     parser::char::{letter, newline, space},
-    satisfy,
+    satisfy, sep_by, Parser, Stream,
 };
-use combine::{parser::char::char, sep_by};
 
 #[allow(unused_imports)]
 use combine::EasyParser;

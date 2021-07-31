@@ -1,16 +1,16 @@
-use crate::html_parser::dom::AttrMap;
-use combine::parser::char::char;
-
-use combine::{between, many, many1, Parser, Stream};
 use combine::{
+    between,
     error::ParseError,
-    parser::char::{letter, newline, space},
+    many, many1,
+    parser::char::{char, letter, newline, space},
+    Parser, Stream,
 };
 
 #[allow(unused_imports)]
 use combine::EasyParser;
 
 use super::parse_attributes::parse_attributes;
+use crate::html_parser::dom::AttrMap;
 
 /**
  * 開始タグ パース
