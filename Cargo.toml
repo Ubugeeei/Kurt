@@ -5,11 +5,14 @@ authors = ["Ubugeeei"]
 edition = "2018"
 
 [[cdylib]]
-name = "html_parser"
-path = "src/html.rs"
-[[cdylib]]
 name = "dom_definition"
 path = "src/dom.rs"
+[[cdylib]]
+name = "parse_attributes"
+path = "src/html_parser/parse_attributes.rs"
+[[cdylib]]
+name = "parse_tags"
+path = "src/html_parser/parse_tags.rs"
 
 [dependencies]
 combine = "4.6.0"
