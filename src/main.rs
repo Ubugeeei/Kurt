@@ -1,9 +1,10 @@
 #[allow(unused_imports)]
 use combine::EasyParser;
 
+mod css_parser;
 mod html_parser;
 fn main() {
-  let html_string = "\
+    let html_string = "\
   <html>\
     <head>\
       <title>my first html parse</title>\
