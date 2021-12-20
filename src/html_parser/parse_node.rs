@@ -83,10 +83,10 @@ mod tests {
     use super::*;
     #[test]
     fn test_parse_text() {
-        let predict = "hello".to_string();
-        let result = parse_text().easy_parse("hello").ok().unwrap();
-        dbg!(result);
-        // assert_eq!(predict, result.1);
+        assert_eq!(
+            parse_text().easy_parse("hello"),
+            Ok((Text::new(String::from("hello")), ""))
+        );
     }
 
     #[test]
