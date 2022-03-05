@@ -4,7 +4,7 @@ use crate::core::utils::whitespaces;
 
 use super::{rule, Rule, Stylesheet};
 
-pub fn parse(raw: String) -> Stylesheet {
+pub fn parse_css(raw: String) -> Stylesheet {
     rules()
         .parse(raw.as_str())
         .map(|(rules, _)| Stylesheet::new(rules))
