@@ -1,8 +1,16 @@
 use super::declarations;
 use crate::core::{selectors, utils::whitespaces, Rule};
-use combine::{error::ParseError, parser::char::char, Parser, Stream};
+use combine::{error::ParseError, parser::char::char, Parser, Stream, many};
 
-pub fn rule<Input>() -> impl Parser<Input, Output = Rule>
+pub fn rules<Input>() -> impl Parser<Input, Output = Vec<Rule>>
+where
+    Input: Stream<Token = char>,
+    Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
+{
+    (whitespaces(), many(rule().skip(whitespaces()))).map(|(_, rules)| rules)
+}
+
+fn rule<Input>() -> impl Parser<Input, Output = Rule>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
