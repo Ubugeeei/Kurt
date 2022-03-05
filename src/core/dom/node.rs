@@ -1,6 +1,12 @@
 use super::super::html::parse_without_normalziation;
 use std::error::Error;
 
+#[allow(unused_imports)]
+use crate::{
+    core::dom::Text,
+    core::dom::{AttrMap, Element},
+};
+
 // `Node` interface
 // definition: https://dom.spec.whatwg.org/#interface-node
 #[derive(Debug, PartialEq)]
@@ -82,10 +88,7 @@ impl ToString for Node {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        core::dom::Text,
-        dom::{AttrMap, Element},
-    };
+    use super::*;
 
     #[test]
     fn test_inner_text() {
