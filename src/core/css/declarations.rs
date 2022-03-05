@@ -6,7 +6,7 @@ use combine::{many1, sep_end_by, ParseError, Parser, Stream};
 use crate::core::utils::whitespaces;
 use crate::core::{CSSValue, Declaration};
 
-fn declarations<Input>() -> impl Parser<Input, Output = Vec<Declaration>>
+pub fn declarations<Input>() -> impl Parser<Input, Output = Vec<Declaration>>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
