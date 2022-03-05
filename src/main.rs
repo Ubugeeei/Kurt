@@ -1,6 +1,6 @@
 mod core;
 
-use crate::core::html::parse_nodes;
+use crate::core::html::parser::parse_nodes;
 
 fn main() {
     let html_string = "\

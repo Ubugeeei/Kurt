@@ -1,5 +1,5 @@
 //! This module includes some implementations on HTML.
-use super::dom::{AttrMap, Element, Node, Text};
+use super::super::dom::{AttrMap, Element, Node, Text};
 
 #[allow(unused_imports)]
 use combine::EasyParser;

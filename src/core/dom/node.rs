@@ -1,4 +1,4 @@
-use super::super::html::parse_without_normalziation;
+use super::super::html::parser::parse_without_normalziation;
 use std::error::Error;
 
 #[allow(unused_imports)]
