@@ -1,7 +1,6 @@
 //! This module includes some implementations on HTML.
+use super::dom::{AttrMap, Element, Node, Text};
 
-use crate::dom::{AttrMap, Document, Element, Node, Text};
-use crate::fetch::Response;
 #[allow(unused_imports)]
 use combine::EasyParser;
 use combine::{
@@ -38,27 +37,35 @@ pub enum HTMLParseError {
 // - html5ever crate by Serve project https://github.com/servo/html5ever
 // - HTMLDocumentParser, HTMLTokenizer, HTMLTreeBuilder of Chromium (src/third_party/blink/renderer/core/html/parser/*)
 
+// TODO: 未実装
 /// This functions parses `response` as HTML in non-standard manner.
-pub fn parse(response: Response) -> Result<Document, HTMLParseError> {
-    // NOTE: Here we assume the resource is HTML and encoded by UTF-8.
-    // We should determine character encoding as follows:
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-input-byte-streama
-    let nodes = parse_without_normalziation(response.data);
-    match nodes {
-        Ok(nodes) => {
-            let document_element = if nodes.len() == 1 {
-                nodes.into_iter().nth(0).unwrap()
-            } else {
-                Element::new("html".to_string(), AttrMap::new(), nodes)
-            };
-            Ok(Document::new(
-                response.url.to_string(),
-                response.url.to_string(),
-                document_element,
-            ))
-        }
-        Err(e) => Err(e),
-    }
+// pub fn parse(response: Response) -> Result<Document, HTMLParseError> {
+//     // NOTE: Here we assume the resource is HTML and encoded by UTF-8.
+//     // We should determine character encoding as follows:
+//     // https://html.spec.whatwg.org/multipage/parsing.html#the-input-byte-streama
+//     let nodes = parse_without_normalziation(response.data);
+//     match nodes {
+//         Ok(nodes) => {
+//             let document_element = if nodes.len() == 1 {
+//                 nodes.into_iter().nth(0).unwrap()
+//             } else {
+//                 Element::new("html".to_string(), AttrMap::new(), nodes)
+//             };
+//             Ok(Document::new(
+//                 response.url.to_string(),
+//                 response.url.to_string(),
+//                 document_element,
+//             ))
+//         }
+//         Err(e) => Err(e),
+//     }
+// }
+// FIXME: 仮置
+pub fn parse_nodes(html_string: &str) -> Result<Vec<Box<Node>>, HTMLParseError> {
+    nodes()
+        .parse(html_string)
+        .map(|(nodes, _)| nodes)
+        .map_err(|e| HTMLParseError::InvalidResourceError(e))
 }
 
 pub fn parse_without_normalziation(data: Vec<u8>) -> Result<Vec<Box<Node>>, HTMLParseError> {
@@ -74,7 +81,7 @@ pub fn parse_without_normalziation(data: Vec<u8>) -> Result<Vec<Box<Node>>, HTML
 }
 
 // `nodes_` (and `nodes`) tries to parse input as Element or Text.
-fn nodes_<Input>() -> impl Parser<Input, Output = Vec<Box<Node>>>
+pub fn nodes_<Input>() -> impl Parser<Input, Output = Vec<Box<Node>>>
 where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
@@ -148,7 +155,8 @@ where
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
     let attribute_name = many1::<String, _, _>(letter());
-    let attribute_inner_value = many1::<String, _, _>(satisfy(|c: char| c != '"')).map(|x|x.replace("&quot;", "\""));
+    let attribute_inner_value =
+        many1::<String, _, _>(satisfy(|c: char| c != '"')).map(|x| x.replace("&quot;", "\""));
     let attribute_value = between(char('"'), char('"'), attribute_inner_value);
     (
         attribute_name,
@@ -189,11 +197,7 @@ mod tests {
     use url::Url;
 
     use super::*;
-    use crate::fetch::{HeaderMap, Response};
-    use crate::{
-        dom::{AttrMap, Document, Element, Text},
-        fetch::{HTTPStatus, ResponseType},
-    };
+    // use crate::fetch::{HeaderMap, Response};
 
     // parsing tests of attributes
     #[test]
@@ -307,97 +311,97 @@ mod tests {
         }
     }
 
-    // parsing tests of documents
-    #[test]
-    fn test_parse_single_without_nest() {
-        let url = "http://example.com";
-        let s = Response {
-            url: Url::parse(url).unwrap(),
-            status: HTTPStatus::OK,
-            rtype: ResponseType::Basic,
-            headers: HeaderMap::new(),
-            data: "<p>Hello World</p>".as_bytes().to_vec(),
-        };
-        let got = parse(s);
-        let expected = Ok(Document::new(
-            Url::parse(url).unwrap().to_string(),
-            Url::parse(url).unwrap().to_string(),
-            Element::new(
-                "p".to_string(),
-                AttrMap::new(),
-                vec![Text::new("Hello World".to_string())],
-            ),
-        ));
-        assert_eq!(got, expected)
-    }
+    // // parsing tests of documents
+    // #[test]
+    // fn test_parse_single_without_nest() {
+    //     let url = "http://example.com";
+    //     let s = Response {
+    //         url: Url::parse(url).unwrap(),
+    //         status: HTTPStatus::OK,
+    //         rtype: ResponseType::Basic,
+    //         headers: HeaderMap::new(),
+    //         data: "<p>Hello World</p>".as_bytes().to_vec(),
+    //     };
+    //     let got = parse(s);
+    //     let expected = Ok(Document::new(
+    //         Url::parse(url).unwrap().to_string(),
+    //         Url::parse(url).unwrap().to_string(),
+    //         Element::new(
+    //             "p".to_string(),
+    //             AttrMap::new(),
+    //             vec![Text::new("Hello World".to_string())],
+    //         ),
+    //     ));
+    //     assert_eq!(got, expected)
+    // }
 
-    #[test]
-    fn test_parse_two_without_nest() {
-        let url = "http://example.com";
-        let s = Response {
-            url: Url::parse(url).unwrap(),
-            status: HTTPStatus::OK,
-            rtype: ResponseType::Basic,
-            headers: HeaderMap::new(),
-            data: "<p>Hello World (1)</p><p>Hello World (2)</p>"
-                .as_bytes()
-                .to_vec(),
-        };
-        let expected = Ok(Document::new(
-            Url::parse(url).unwrap().to_string(),
-            Url::parse(url).unwrap().to_string(),
-            Element::new(
-                "html".to_string(),
-                AttrMap::new(),
-                vec![
-                    Element::new(
-                        "p".to_string(),
-                        AttrMap::new(),
-                        vec![Text::new("Hello World (1)".to_string())],
-                    ),
-                    Element::new(
-                        "p".to_string(),
-                        AttrMap::new(),
-                        vec![Text::new("Hello World (2)".to_string())],
-                    ),
-                ],
-            ),
-        ));
-        assert_eq!(parse(s), expected)
-    }
+    // #[test]
+    // fn test_parse_two_without_nest() {
+    //     let url = "http://example.com";
+    //     let s = Response {
+    //         url: Url::parse(url).unwrap(),
+    //         status: HTTPStatus::OK,
+    //         rtype: ResponseType::Basic,
+    //         headers: HeaderMap::new(),
+    //         data: "<p>Hello World (1)</p><p>Hello World (2)</p>"
+    //             .as_bytes()
+    //             .to_vec(),
+    //     };
+    //     let expected = Ok(Document::new(
+    //         Url::parse(url).unwrap().to_string(),
+    //         Url::parse(url).unwrap().to_string(),
+    //         Element::new(
+    //             "html".to_string(),
+    //             AttrMap::new(),
+    //             vec![
+    //                 Element::new(
+    //                     "p".to_string(),
+    //                     AttrMap::new(),
+    //                     vec![Text::new("Hello World (1)".to_string())],
+    //                 ),
+    //                 Element::new(
+    //                     "p".to_string(),
+    //                     AttrMap::new(),
+    //                     vec![Text::new("Hello World (2)".to_string())],
+    //                 ),
+    //             ],
+    //         ),
+    //     ));
+    //     assert_eq!(parse(s), expected)
+    // }
 
-    #[test]
-    fn test_parse_with_nest() {
-        let url = "http://example.com";
-        let s = Response {
-            url: Url::parse(url).unwrap(),
-            status: HTTPStatus::OK,
-            rtype: ResponseType::Basic,
-            headers: HeaderMap::new(),
-            data: "<div><p>nested (1)</p><p>nested (2)</p></div>"
-                .as_bytes()
-                .to_vec(),
-        };
-        let expected = Ok(Document::new(
-            Url::parse(url).unwrap().to_string(),
-            Url::parse(url).unwrap().to_string(),
-            Element::new(
-                "div".to_string(),
-                AttrMap::new(),
-                vec![
-                    Element::new(
-                        "p".to_string(),
-                        AttrMap::new(),
-                        vec![Text::new("nested (1)".to_string())],
-                    ),
-                    Element::new(
-                        "p".to_string(),
-                        AttrMap::new(),
-                        vec![Text::new("nested (2)".to_string())],
-                    ),
-                ],
-            ),
-        ));
-        assert_eq!(parse(s), expected)
-    }
+    // #[test]
+    // fn test_parse_with_nest() {
+    //     let url = "http://example.com";
+    //     let s = Response {
+    //         url: Url::parse(url).unwrap(),
+    //         status: HTTPStatus::OK,
+    //         rtype: ResponseType::Basic,
+    //         headers: HeaderMap::new(),
+    //         data: "<div><p>nested (1)</p><p>nested (2)</p></div>"
+    //             .as_bytes()
+    //             .to_vec(),
+    //     };
+    //     let expected = Ok(Document::new(
+    //         Url::parse(url).unwrap().to_string(),
+    //         Url::parse(url).unwrap().to_string(),
+    //         Element::new(
+    //             "div".to_string(),
+    //             AttrMap::new(),
+    //             vec![
+    //                 Element::new(
+    //                     "p".to_string(),
+    //                     AttrMap::new(),
+    //                     vec![Text::new("nested (1)".to_string())],
+    //                 ),
+    //                 Element::new(
+    //                     "p".to_string(),
+    //                     AttrMap::new(),
+    //                     vec![Text::new("nested (2)".to_string())],
+    //                 ),
+    //             ],
+    //         ),
+    //     ));
+    //     assert_eq!(parse(s), expected)
+    // }
 }
