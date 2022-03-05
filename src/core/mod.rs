@@ -1,3 +1,5 @@
+mod utils;
+
 pub mod html;
 pub use self::html::*;
 
