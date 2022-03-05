@@ -1,9 +1,13 @@
-
 /// `Stylesheet` represents a single stylesheet.
 /// It consists of multiple rules, which are called "rule-list" in the standard (https://www.w3.org/TR/css-syntax-3/).
 #[derive(Debug, PartialEq)]
 pub struct Stylesheet {
     pub rules: Vec<Rule>,
+}
+impl Stylesheet {
+    pub fn new(rules: Vec<Rule>) -> Self {
+        Stylesheet { rules: rules }
+    }
 }
 
 /// `Rule` represents a single CSS rule.
