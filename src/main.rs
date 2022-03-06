@@ -16,18 +16,9 @@ fn main() {
           </div>\
         </body>\
       </html>\
-  ";
+    ";
 
-    let css_string = "\
-      body {\
-        background-color: #f0f0f0;\
-      }\
-\
-      .content {\
-        width: 960px;\
-        margin: 0 auto;\
-      }\
-";
+    let css_string = ".content { width: 1024px; font-size: 12px; }";
 
     // parse html
     let dom = parse_nodes(html_string);
