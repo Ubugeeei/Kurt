@@ -23,6 +23,9 @@ fn main() {
         width: 1024px;\
         font-size: 12px;\
       }\
+      p[id~=hello] {\
+        font-size: 10px;\
+      }\
     ";
 
     // parse html
