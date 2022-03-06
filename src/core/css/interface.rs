@@ -65,4 +65,11 @@ pub struct Declaration {
 #[derive(Debug, PartialEq, Clone)]
 pub enum CSSValue {
     Keyword(String),
+    Length((usize, Unit)),
+}
+#[derive(Debug, PartialEq, Clone)]
+pub enum Unit {
+    Em,
+    Px,
+    Percent,
 }
