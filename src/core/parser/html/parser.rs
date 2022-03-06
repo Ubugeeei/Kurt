@@ -21,59 +21,9 @@ pub enum HTMLParseError {
     InvalidResourceError(StringStreamError),
 }
 
-// [NOTE] Specification on HTML parsing: https://html.spec.whatwg.org/multipage/parsing.html#parsing
-//
-// The specification defines parsing algorithm of HTML, which takes input stream as argument and emits DOM.
-// It consists of the following two stages:
-// 1. tokenization stage
-// 2. tree construction stage
-// The first one, tokenization stage, generates tokens from input stream.
-// The latter one, tree construction stage, constructs a DOM while handling scripts inside <script> tags.
-//
-// This implementation omits details of those two stages for simplicity.
-// Please check the following if you'd like to know about the parsing process more deeply:
-// - html5ever crate by Serve project https://github.com/servo/html5ever
-// - HTMLDocumentParser, HTMLTokenizer, HTMLTreeBuilder of Chromium (src/third_party/blink/renderer/core/html/parser/*)
-
-// TODO: 未実装
-/// This functions parses `response` as HTML in non-standard manner.
-// pub fn parse(response: Response) -> Result<Document, HTMLParseError> {
-//     // NOTE: Here we assume the resource is HTML and encoded by UTF-8.
-//     // We should determine character encoding as follows:
-//     // https://html.spec.whatwg.org/multipage/parsing.html#the-input-byte-streama
-//     let nodes = parse_without_normalziation(response.data);
-//     match nodes {
-//         Ok(nodes) => {
-//             let document_element = if nodes.len() == 1 {
-//                 nodes.into_iter().nth(0).unwrap()
-//             } else {
-//                 Element::new("html".to_string(), AttrMap::new(), nodes)
-//             };
-//             Ok(Document::new(
-//                 response.url.to_string(),
-//                 response.url.to_string(),
-//                 document_element,
-//             ))
-//         }
-//         Err(e) => Err(e),
-//     }
-// }
-// FIXME: 仮置
 pub fn parse_html(html_string: &str) -> Result<Vec<Box<Node>>, HTMLParseError> {
     nodes()
         .parse(html_string)
-        .map(|(nodes, _)| nodes)
-        .map_err(|e| HTMLParseError::InvalidResourceError(e))
-}
-
-pub fn parse_without_normalziation(data: Vec<u8>) -> Result<Vec<Box<Node>>, HTMLParseError> {
-    // NOTE: Here we assume the resource is HTML and encoded by UTF-8.
-    // We should determine character encoding as follows:
-    // https://html.spec.whatwg.org/multipage/parsing.html#the-input-byte-streama
-    let body = String::from_utf8(data).unwrap();
-
-    nodes()
-        .parse(&body as &str)
         .map(|(nodes, _)| nodes)
         .map_err(|e| HTMLParseError::InvalidResourceError(e))
 }

@@ -1,4 +1,3 @@
-use super::super::html::parser::parse_without_normalziation;
 use std::error::Error;
 
 #[allow(unused_imports)]
@@ -43,12 +42,6 @@ impl Node {
             .map(|node| node.to_string())
             .collect::<Vec<_>>()
             .join("")
-    }
-
-    pub fn set_inner_html(&mut self, html: String) -> Result<(), Box<dyn Error>> {
-        let node = parse_without_normalziation(html.as_bytes().into())?;
-        self.children = node;
-        Ok(())
     }
 }
 
