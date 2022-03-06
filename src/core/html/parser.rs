@@ -59,7 +59,7 @@ pub enum HTMLParseError {
 //     }
 // }
 // FIXME: 仮置
-pub fn parse_nodes(html_string: &str) -> Result<Vec<Box<Node>>, HTMLParseError> {
+pub fn parse_html(html_string: &str) -> Result<Vec<Box<Node>>, HTMLParseError> {
     nodes()
         .parse(html_string)
         .map(|(nodes, _)| nodes)

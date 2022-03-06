@@ -1,7 +1,7 @@
 mod core;
 
 use crate::core::css::stylesheet::parse_css;
-use crate::core::html::parser::parse_nodes;
+use crate::core::html::parser::parse_html;
 
 fn main() {
     let html_string = "\
@@ -18,10 +18,15 @@ fn main() {
       </html>\
     ";
 
-    let css_string = ".content { width: 1024px; font-size: 12px; }";
+    let css_string = "\
+      .content {\
+        width: 1024px;\
+        font-size: 12px;\
+      }\
+    ";
 
     // parse html
-    let dom = parse_nodes(html_string);
+    let dom = parse_html(html_string);
     dbg!(dom);
 
     // parse css
