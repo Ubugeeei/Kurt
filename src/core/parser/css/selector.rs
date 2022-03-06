@@ -1,4 +1,4 @@
-use super::{AttributeSelectorOp, Selector, SimpleSelector};
+use crate::core::cssom::{AttributeSelectorOp, Selector, SimpleSelector};
 use crate::core::utils::whitespaces;
 use combine::{
     choice,

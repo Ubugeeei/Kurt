@@ -1,4 +1,4 @@
-use super::Stylesheet;
+use crate::core::cssom::Stylesheet;
 use crate::core::parser::rules;
 use combine::{error::StringStreamError, Parser};
 

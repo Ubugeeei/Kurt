@@ -1,6 +1,9 @@
 use super::declarations;
-use crate::core::parser::{selectors, utils::whitespaces, Rule};
-use combine::{error::ParseError, parser::char::char, Parser, Stream, many};
+use crate::core::{
+    cssom::Rule,
+    parser::{selectors, utils::whitespaces},
+};
+use combine::{error::ParseError, many, parser::char::char, Parser, Stream};
 
 pub fn rules<Input>() -> impl Parser<Input, Output = Vec<Rule>>
 where
@@ -29,7 +32,7 @@ where
 
 mod tests {
     #[allow(unused_imports)]
-    use crate::core::parser::{AttributeSelectorOp, CSSValue, Declaration, SimpleSelector};
+    use crate::core::cssom::{AttributeSelectorOp, CSSValue, Declaration, SimpleSelector};
 
     #[allow(unused_imports)]
     use super::*;
