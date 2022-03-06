@@ -1,5 +1,5 @@
 use super::declarations;
-use crate::core::{selectors, utils::whitespaces, Rule};
+use crate::core::parser::{selectors, utils::whitespaces, Rule};
 use combine::{error::ParseError, parser::char::char, Parser, Stream, many};
 
 pub fn rules<Input>() -> impl Parser<Input, Output = Vec<Rule>>
@@ -29,7 +29,7 @@ where
 
 mod tests {
     #[allow(unused_imports)]
-    use crate::core::{AttributeSelectorOp, CSSValue, Declaration, SimpleSelector};
+    use crate::core::parser::{AttributeSelectorOp, CSSValue, Declaration, SimpleSelector};
 
     #[allow(unused_imports)]
     use super::*;

@@ -1,10 +1,5 @@
-mod utils;
-
-pub mod html;
-pub use self::html::*;
-
-pub mod css;
-pub use self::css::*;
+pub mod parser;
+pub use self::parser::*;
 
 mod dom;
 pub use self::dom::*;

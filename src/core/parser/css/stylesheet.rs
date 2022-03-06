@@ -1,5 +1,5 @@
 use super::Stylesheet;
-use crate::core::rules;
+use crate::core::parser::rules;
 use combine::{error::StringStreamError, Parser};
 
 pub fn parse_css(raw: String) -> Result<Stylesheet, StringStreamError> {

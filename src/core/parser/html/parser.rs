@@ -1,6 +1,6 @@
 //! This module includes some implementations on HTML.
 
-use super::super::dom::{Element, Node, Text};
+use super::super::super::dom::{Element, Node, Text};
 use super::tag::{close_tag, open_tag};
 
 use combine::satisfy;

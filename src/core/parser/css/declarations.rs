@@ -5,7 +5,7 @@ use combine::{
 };
 
 use crate::core::utils::whitespaces;
-use crate::core::{CSSValue, Declaration, Unit};
+use crate::core::parser::{CSSValue, Declaration, Unit};
 
 pub fn declarations<Input>() -> impl Parser<Input, Output = Vec<Declaration>>
 where
