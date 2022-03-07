@@ -1,21 +1,20 @@
 mod core;
 
-use crate::core::create_styled_nodes;
 use crate::core::css::stylesheet::parse_css;
 use crate::core::html::parser::parse_html;
+use crate::core::{create_element_container, create_layout_document, create_styled_document};
 
 const HTML: &str = "\
-  <html>\
-    <head>\
-      <title>my first html parse</title>\
-    </head>\
     <body>\
       <span class=\"hide\">hide</span>\
       <div id=\"main\" class=\"content\">\
         <p>hello rust html parser!!</p>\
+        <p>hello rust html parser!!</p>\
+        <p>hello rust html parser!!</p>\
+        <p>hello rust html parser!!</p>\
+        <p>hello rust html parser!!</p>\
       </div>\
     </body>\
-  </html>\
 ";
 
 const CSS: &str = r#"
@@ -34,15 +33,39 @@ const CSS: &str = r#"
     display: none;
   }
 "#;
+
+const DEFAULT_STYLESHEET: &str = r#"
+  script, style {
+    display: none;
+  }
+  p, div {
+    display: block;
+  }
+"#;
 fn main() {
     // parse html
     let dom = parse_html(HTML).unwrap();
     dbg!(&dom);
 
     // parse css
-    let cssom = parse_css(String::from(CSS)).unwrap();
+    let styles = format!("{}\n{}", DEFAULT_STYLESHEET, CSS);
+    let cssom = parse_css(styles).unwrap();
     dbg!(&cssom);
 
-    let styled_nodes = create_styled_nodes(&dom, &cssom);
-    dbg!(&styled_nodes);
+    // create styled document from dom and cssom
+    let styled_document = create_styled_document(&dom, &cssom);
+    dbg!(&styled_document);
+
+    // culc layout
+    let layout_document = create_layout_document(styled_document);
+    dbg!(&layout_document);
+
+    // create box view
+    let view = create_element_container(&layout_document.top_box);
+    dbg!(&view);
+
+    // rendering
+    let mut siv = cursive::default();
+    siv.add_fullscreen_layer(view);
+    siv.run();
 }
