@@ -8,3 +8,5 @@ pub struct StyledNode<'a> {
     pub children: Vec<StyledNode<'a>>,
     pub properties: HashMap<String, CSSValue>,
 }
+
+pub type PropertyMap = HashMap<String, CSSValue>;
