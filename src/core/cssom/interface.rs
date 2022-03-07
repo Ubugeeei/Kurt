@@ -58,7 +58,9 @@ impl SimpleSelector {
                 NodeType::Element(ref element) => {
                     element.tag_name.as_str() == tag_name
                         && match op {
-                            AttributeSelectorOp::Eq => element.attributes.get(attribute) == Some(value),
+                            AttributeSelectorOp::Eq => {
+                                element.attributes.get(attribute) == Some(value)
+                            }
 
                             AttributeSelectorOp::Contain => element
                                 .attributes
@@ -77,7 +79,9 @@ impl SimpleSelector {
             },
 
             SimpleSelector::ClassSelector { class_name } => match node.node_type {
-                NodeType::Element(ref element) => element.attributes.get("class") == Some(class_name),
+                NodeType::Element(ref element) => {
+                    element.attributes.get("class") == Some(class_name)
+                }
                 _ => false,
             },
         }
@@ -119,12 +123,15 @@ mod tests {
     fn test_universal_selector_behaviour() {
         let element = &Element::new(
             "p".to_string(),
-            [("id".to_string(), "test".to_string()),
-            ("class".to_string(), "testclass".to_string())]
-                .iter()
-                .cloned()
-                .collect(),
+            [
+                ("id".to_string(), "test".to_string()),
+                ("class".to_string(), "testclass".to_string()),
+            ]
+            .iter()
+            .cloned()
+            .collect(),
             vec![],
         );
         assert_eq!(SimpleSelector::UniversalSelector.matches(element), true);
+    }
 }
