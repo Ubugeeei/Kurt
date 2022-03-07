@@ -8,5 +8,24 @@ pub struct StyledNode<'a> {
     pub children: Vec<StyledNode<'a>>,
     pub properties: HashMap<String, CSSValue>,
 }
+impl<'a> StyledNode<'a> {
+    pub fn display(&self) -> Display {
+        match self.properties.get("display") {
+            Some(CSSValue::Keyword(s)) => match s.as_str() {
+                "block" => Display::Block,
+                "none" => Display::None,
+                _ => Display::Inline,
+            },
+            _ => Display::Inline,
+        }
+    }
+}
 
 pub type PropertyMap = HashMap<String, CSSValue>;
+
+#[derive(Debug, PartialEq)]
+pub enum Display {
+    Inline,
+    Block,
+    None,
+}
