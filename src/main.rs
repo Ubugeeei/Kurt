@@ -23,7 +23,7 @@ const CSS: &str = r#"
     font-size: 12px;
   }
 
-  p[id~=hello] {
+  p {
     font-size: 10px;
     font-weight: bold;
     color: grey;
