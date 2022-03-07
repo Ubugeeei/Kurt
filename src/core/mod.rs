@@ -12,3 +12,6 @@ pub use self::styled_node::*;
 
 mod layout;
 pub use self::layout::*;
+
+mod paint;
+pub use self::paint::*;
