@@ -1,5 +1,15 @@
-use super::{PropertyMap, StyledNode};
-use crate::core::{Node, Stylesheet};
+use super::{PropertyMap, StyledDocument, StyledNode};
+use crate::core::{Document, Node, Stylesheet};
+
+pub fn create_styled_document<'a>(
+    document: &'a Document,
+    stylesheet: &Stylesheet,
+) -> StyledDocument<'a> {
+    let document_element = create_styled_node(&document.document_element, &stylesheet);
+    StyledDocument {
+        document_element: document_element,
+    }
+}
 
 fn create_styled_node<'a>(node: &'a Box<Node>, stylesheet: &Stylesheet) -> StyledNode<'a> {
     // prepare basic information of StyledNode
@@ -21,7 +31,10 @@ fn create_styled_node<'a>(node: &'a Box<Node>, stylesheet: &Stylesheet) -> Style
     }
 }
 
-pub fn create_styled_nodes<'a>(nodes: &'a Vec<Box<Node>>, stylesheet: &Stylesheet) -> Vec<StyledNode<'a>> {
+fn create_styled_nodes<'a>(
+    nodes: &'a Vec<Box<Node>>,
+    stylesheet: &Stylesheet,
+) -> Vec<StyledNode<'a>> {
     nodes
         .iter()
         .map(|x| create_styled_node(x, stylesheet))
