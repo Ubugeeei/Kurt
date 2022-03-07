@@ -21,7 +21,7 @@ pub fn create_layout_box<'a>(snode: StyledNode<'a>) -> LayoutBox<'a> {
           .fold(vec![], |mut acc: Vec<LayoutBox>, child| {
               match child.display() {
                   Display::Block => {
-                      acc.push(to_layout_box(child));
+                      acc.push(create_layout_box(child));
                       acc
                   }
                   Display::Inline => {
@@ -35,7 +35,7 @@ pub fn create_layout_box<'a>(snode: StyledNode<'a>) -> LayoutBox<'a> {
                               children: vec![],
                           }),
                       };
-                      acc.last_mut().unwrap().children.push(to_layout_box(child));
+                      acc.last_mut().unwrap().children.push(create_layout_box(child));
                       acc
                   }
                   Display::None => unreachable!(),
