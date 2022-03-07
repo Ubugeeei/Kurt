@@ -1,5 +1,7 @@
 //! This module includes some implementations on HTML.
 
+use crate::core::{AttrMap, Document};
+
 use super::super::super::dom::{Element, Node, Text};
 use super::tag::{close_tag, open_tag};
 
@@ -21,11 +23,33 @@ pub enum HTMLParseError {
     InvalidResourceError(StringStreamError),
 }
 
-pub fn parse_html(html_string: &str) -> Result<Vec<Box<Node>>, HTMLParseError> {
-    nodes()
+pub fn parse_html(html_string: &str) -> Result<Document, HTMLParseError> {
+    let _nodes = nodes()
         .parse(html_string)
         .map(|(nodes, _)| nodes)
-        .map_err(|e| HTMLParseError::InvalidResourceError(e))
+        .map_err(|e| HTMLParseError::InvalidResourceError(e));
+
+    match _nodes {
+        Ok(nodes) => {
+            let document_element = if nodes.len() == 1 {
+                nodes.into_iter().nth(0).unwrap()
+            } else {
+                Element::new("html".to_string(), AttrMap::new(), nodes)
+            };
+            // TODO: set url
+            // Ok(Document::new(
+            //     response.url.to_string(),
+            //     response.url.to_string(),
+            //     document_element,
+            // ))
+            Ok(Document::new(
+                "".to_string(),
+                "".to_string(),
+                document_element,
+            ))
+        }
+        Err(e) => Err(e),
+    }
 }
 
 // `nodes_` (and `nodes`) tries to parse input as Element or Text.
