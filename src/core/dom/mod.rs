@@ -1,5 +1,3 @@
-//! This module includes some implementations on Document Object Model (DOM).
-
 pub mod document;
 pub use self::document::*;
 

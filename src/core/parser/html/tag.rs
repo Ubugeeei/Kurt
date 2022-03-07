@@ -1,3 +1,4 @@
+use super::attr::attributes;
 use crate::core::AttrMap;
 use combine::{
     between,
@@ -7,9 +8,6 @@ use combine::{
     Parser, Stream,
 };
 
-use super::attr::attributes;
-
-/// `open_tag` consumes `<tag_name attr_name="attr_value" ...>`.
 pub fn open_tag<Input>() -> impl Parser<Input, Output = (String, AttrMap)>
 where
     Input: Stream<Token = char>,
@@ -25,7 +23,6 @@ where
     between(char('<'), char('>'), open_tag_content)
 }
 
-/// close_tag consumes `</tag_name>`.
 pub fn close_tag<Input>() -> impl Parser<Input, Output = String>
 where
     Input: Stream<Token = char>,
@@ -72,7 +69,6 @@ mod tests {
         }
     }
 
-    // parsing tests of close tags
     #[test]
     fn test_parse_close_tag() {
         let result = close_tag().easy_parse("</p>");

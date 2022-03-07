@@ -1,20 +1,18 @@
 //! This module includes some implementations on HTML.
 
+use super::{
+    super::super::dom::{Element, Node, Text},
+    tag::{close_tag, open_tag},
+};
 use crate::core::{AttrMap, Document};
 
-use super::super::super::dom::{Element, Node, Text};
-use super::tag::{close_tag, open_tag};
-
-use combine::satisfy;
 #[allow(unused_imports)]
-use combine::EasyParser;
 use combine::{
-    attempt,
+    attempt, choice,
+    error::ParseError,
     error::{StreamError, StringStreamError},
-    many,
+    many, many1, parser, satisfy, EasyParser, Parser, Stream,
 };
-use combine::{choice, error::ParseError};
-use combine::{many1, parser, Parser, Stream};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -61,7 +59,6 @@ where
     attempt(many(choice((attempt(element()), attempt(text())))))
 }
 
-/// `text` consumes input until `<` comes.
 fn text<Input>() -> impl Parser<Input, Output = Box<Node>>
 where
     Input: Stream<Token = char>,
@@ -70,7 +67,6 @@ where
     many1(satisfy(|c: char| c != '<')).map(|t| Text::new(t))
 }
 
-/// `element` consumes `<tag_name attr_name="attr_value" ...>(children)</tag_name>`.
 fn element<Input>() -> impl Parser<Input, Output = Box<Node>>
 where
     Input: Stream<Token = char>,
@@ -108,7 +104,6 @@ mod tests {
 
     use super::*;
 
-    // parsing tests of an element
     #[test]
     fn test_parse_element() {
         assert_eq!(
@@ -131,7 +126,6 @@ mod tests {
         assert!(element().easy_parse("<p>Hello World</div>").is_err());
     }
 
-    // parsing tests of a tag
     #[test]
     fn test_parse_text() {
         {

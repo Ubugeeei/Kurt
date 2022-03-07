@@ -1,8 +1,9 @@
 mod core;
-
-use crate::core::css::stylesheet::parse_css;
-use crate::core::html::parser::parse_html;
-use crate::core::{create_element_container, create_layout_document, create_styled_document};
+use crate::core::{
+    css::stylesheet::parse_css,
+    html::parser::parse_html,
+    {create_element_container, create_layout_document, create_styled_document},
+};
 
 const HTML: &str = "\
     <body>\
@@ -42,6 +43,7 @@ const DEFAULT_STYLESHEET: &str = r#"
     display: block;
   }
 "#;
+
 fn main() {
     // parse html
     let dom = parse_html(HTML).unwrap();
@@ -56,7 +58,7 @@ fn main() {
     let styled_document = create_styled_document(&dom, &cssom);
     dbg!(&styled_document);
 
-    // culc layout
+    // calc layout
     let layout_document = create_layout_document(styled_document);
     dbg!(&layout_document);
 

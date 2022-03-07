@@ -12,18 +12,15 @@ pub fn create_styled_document<'a>(
 }
 
 fn create_styled_node<'a>(node: &'a Box<Node>, stylesheet: &Stylesheet) -> StyledNode<'a> {
-    // prepare basic information of StyledNode
     let mut props = PropertyMap::new();
     let children = create_styled_nodes(&node.children, stylesheet);
 
-    // match CSS rules
     for matched_rule in stylesheet.rules.iter().filter(|r| r.matches(node)) {
         for declaration in &matched_rule.declarations {
             props.insert(declaration.name.clone(), declaration.value.clone());
         }
     }
 
-    // all set :-)
     StyledNode {
         node_type: &node.node_type,
         properties: props,

@@ -1,12 +1,10 @@
-use std::error::Error;
-
 #[allow(unused_imports)]
 use crate::{
     core::dom::Text,
     core::dom::{AttrMap, Element},
 };
 
-// `Node` interface
+
 // definition: https://dom.spec.whatwg.org/#interface-node
 #[derive(Debug, PartialEq)]
 pub struct Node {
@@ -18,31 +16,6 @@ pub struct Node {
 pub enum NodeType {
     Element(super::element::Element),
     Text(super::chardata::Text),
-}
-
-impl Node {
-    pub fn inner_text(&self) -> String {
-        self.children
-            .iter()
-            .clone()
-            .into_iter()
-            .map(|node| match &node.node_type {
-                NodeType::Text(t) => t.data.clone(),
-                _ => node.inner_text(),
-            })
-            .collect::<Vec<_>>()
-            .join("")
-    }
-
-    pub fn inner_html(&self) -> String {
-        self.children
-            .iter()
-            .clone()
-            .into_iter()
-            .map(|node| node.to_string())
-            .collect::<Vec<_>>()
-            .join("")
-    }
 }
 
 impl ToString for Node {
@@ -75,50 +48,6 @@ impl ToString for Node {
                 }
             }
             NodeType::Text(ref t) => t.data.clone(),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_inner_text() {
-        {
-            let node = Element::new(
-                "p".to_string(),
-                AttrMap::new(),
-                vec![Text::new("hello world".to_string())],
-            );
-            assert_eq!(node.inner_text(), "hello world".to_string());
-        }
-        {
-            let node = Element::new(
-                "div".to_string(),
-                AttrMap::new(),
-                vec![
-                    Text::new("hello world".to_string()),
-                    Element::new(
-                        "p".to_string(),
-                        AttrMap::new(),
-                        vec![
-                            Element::new(
-                                "p".to_string(),
-                                AttrMap::new(),
-                                vec![Text::new("1".to_string())],
-                            ),
-                            Element::new("p".to_string(), AttrMap::new(), vec![]),
-                            Element::new(
-                                "p".to_string(),
-                                AttrMap::new(),
-                                vec![Text::new("3".to_string())],
-                            ),
-                        ],
-                    ),
-                ],
-            );
-            assert_eq!(node.inner_text(), "hello world13".to_string());
         }
     }
 }
