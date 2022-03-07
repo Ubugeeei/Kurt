@@ -10,6 +10,7 @@ const HTML: &str = "\
       <title>my first html parse</title>\
     </head>\
     <body>\
+      <span class=\"hide\">hide</span>\
       <div id=\"main\" class=\"content\">\
         <p>hello rust html parser!!</p>\
       </div>\
@@ -27,6 +28,10 @@ const CSS: &str = r#"
     font-size: 10px;
     font-weight: bold;
     color: grey;
+  }
+
+  .hide {
+    display: none;
   }
 "#;
 fn main() {
