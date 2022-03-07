@@ -62,7 +62,6 @@ fn main() {
 
     // create box view
     let view = create_element_container(&layout_document.top_box);
-    dbg!(&view);
 
     // rendering
     let mut siv = cursive::default();
