@@ -1,11 +1,13 @@
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+use sdl2::render::Canvas;
+use sdl2::video::Window;
 use sdl2::{event::Event, rect::Rect};
 
 use crate::core::LayoutBox;
 
 // TODO: render layout
-pub fn render(_layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
+pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
 
@@ -20,13 +22,11 @@ pub fn render(_layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .map_err(|e| e.to_string())?;
 
+    // draw base
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
     canvas.present();
-
-    canvas.set_draw_color(Color::RGB(255, 210, 0));
-    let _ = canvas.fill_rect(Rect::new(10, 10, 780, 580));
-    canvas.present();
+    paint_layout(&mut canvas, layout);
 
     'mainloop: loop {
         for event in sdl_context.event_pump()?.poll_iter() {
@@ -54,4 +54,10 @@ pub fn render(_layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+fn paint_layout(canvas: &mut Canvas<Window>, _layout: &LayoutBox) {
+    // canvas.set_draw_color(Color::RGB(255, 210, 0));
+    // let _ = canvas.fill_rect(Rect::new(10, 10, 780, 580));
+    // canvas.present();
 }
