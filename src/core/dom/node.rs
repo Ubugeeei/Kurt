@@ -4,7 +4,6 @@ use crate::{
     core::dom::{AttrMap, Element},
 };
 
-
 // definition: https://dom.spec.whatwg.org/#interface-node
 #[derive(Debug, PartialEq)]
 pub struct Node {

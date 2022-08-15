@@ -4,8 +4,8 @@ use combine::{
     sep_end_by, ParseError, Parser, Stream,
 };
 
-use crate::core::utils::whitespaces;
 use crate::core::cssom::{CSSValue, Declaration, Unit};
+use crate::core::utils::whitespaces;
 
 pub fn declarations<Input>() -> impl Parser<Input, Output = Vec<Declaration>>
 where
