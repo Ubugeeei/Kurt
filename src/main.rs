@@ -47,8 +47,19 @@ const DEFAULT_STYLESHEET: &str = r#"
   script, style {
     display: none;
   }
-  p, div {
+  body {
     display: block;
+    margin: 8px;
+  }
+  div {
+    display: block;
+  }
+  p {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 "#;
 
