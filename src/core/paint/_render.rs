@@ -1,7 +1,9 @@
+use sdl2::gfx::primitives::DrawRenderer;
+use sdl2::image::{self, InitFlag, Sdl2ImageContext, LoadTexture};
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
-use sdl2::ttf::Sdl2TtfContext;
+use sdl2::ttf::{Sdl2TtfContext, self};
 use sdl2::video::Window;
 use sdl2::{event::Event, rect::Rect};
 
@@ -11,7 +13,8 @@ use crate::core::{LayoutBox, NodeType};
 pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
-    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
+    let ttf_context = ttf::init().map_err(|e| e.to_string())?;
+    let _image_context = image::init(InitFlag::PNG | InitFlag::JPG)?;
 
     let window = video_subsystem
         .window("panel-pop", 1600, 1000)
@@ -24,13 +27,9 @@ pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .map_err(|e| e.to_string())?;
 
-    // draw base
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
-    canvas.clear();
-    canvas.present();
 
-    // draw layout
-    let _ = paint_layout(&mut canvas, ttf_context, layout);
+    let _ = paint_base(&mut canvas, &ttf_context);
+    // let _ = paint_layout(&mut canvas, &ttf_context, layout);
 
     'mainloop: loop {
         for event in sdl_context.event_pump()?.poll_iter() {
@@ -60,9 +59,47 @@ pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn paint_base(
+    canvas: &mut Canvas<Window>,
+    _ttf_context: &Sdl2TtfContext,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // background
+    canvas.set_draw_color(Color::RGB(255, 255, 255));
+    canvas.clear();
+    canvas.present();
+
+    // header
+    canvas.set_draw_color(Color::RGB(60, 60, 60));
+    let _ = canvas.fill_rect(Rect::new(0, 0, 1600,70));
+    canvas.present();
+
+    // TODO: cursor
+    canvas.set_draw_color(Color::RGB(30, 30, 30));
+    let _ = canvas.fill_rect(Rect::new(120, 10, 1000, 30));
+    canvas.present();
+    let _ = canvas.filled_circle(121, 25, 15,Color::RGB(30, 30, 30));
+    canvas.present();
+    let _ = canvas.filled_circle(1119, 25, 15,Color::RGB(30, 30, 30));
+    canvas.present();
+
+    let texture_creator = canvas.texture_creator();
+    let texture = texture_creator.load_texture("./assets/img/arrow-left.png")?;
+    canvas.copy(&texture, None, Rect::new(10, 15, 20, 24))?;
+    canvas.present();
+    let texture = texture_creator.load_texture("./assets/img/arrow-right.png")?;
+    canvas.copy(&texture, None, Rect::new(40, 15, 20, 24))?;
+    canvas.present();
+    let texture = texture_creator.load_texture("./assets/img/reload.png")?;
+    canvas.copy(&texture, None, Rect::new(70, 15, 20, 24))?;
+    canvas.present();
+
+
+    Ok(())
+}
+
 fn paint_layout(
     canvas: &mut Canvas<Window>,
-    ttf_context: Sdl2TtfContext,
+    ttf_context: &Sdl2TtfContext,
     layout: &LayoutBox,
 ) -> Result<(), Box<dyn std::error::Error>> {
     match layout.box_props {
