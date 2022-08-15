@@ -6,9 +6,9 @@ use crate::core::{
 };
 
 extern crate sdl2;
-use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+use sdl2::{event::Event, rect::Rect};
 
 const HTML: &str = "\
     <body>\
@@ -81,7 +81,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let video_subsystem = sdl_context.video()?;
 
     let window = video_subsystem
-        .window("panel-pop", 800, 600)
+        .window("panel-pop", 1600, 1000)
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;
@@ -93,6 +93,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     canvas.clear();
+    canvas.present();
+
+    canvas.set_draw_color(Color::RGB(255, 210, 0));
+    let _ = canvas.fill_rect(Rect::new(10, 10, 780, 580));
     canvas.present();
 
     'mainloop: loop {
