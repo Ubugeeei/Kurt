@@ -25,12 +25,12 @@ pub fn parse_html(html_string: &str) -> Result<Document, HTMLParseError> {
     let _nodes = nodes()
         .parse(html_string)
         .map(|(nodes, _)| nodes)
-        .map_err(|e| HTMLParseError::InvalidResourceError(e));
+        .map_err(HTMLParseError::InvalidResourceError);
 
     match _nodes {
         Ok(nodes) => {
             let document_element = if nodes.len() == 1 {
-                nodes.into_iter().nth(0).unwrap()
+                nodes.into_iter().next().unwrap()
             } else {
                 Element::new("html".to_string(), AttrMap::new(), nodes)
             };
@@ -64,7 +64,7 @@ where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-    many1(satisfy(|c: char| c != '<')).map(|t| Text::new(t))
+    many1(satisfy(|c: char| c != '<')).map(Text::new)
 }
 
 fn element<Input>() -> impl Parser<Input, Output = Box<Node>>

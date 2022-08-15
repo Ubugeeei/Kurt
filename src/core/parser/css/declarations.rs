@@ -36,7 +36,7 @@ where
     Input: Stream<Token = char>,
     Input::Error: ParseError<Input::Token, Input::Range, Input::Position>,
 {
-    let keyword = many1(letter()).map(|s| CSSValue::Keyword(s));
+    let keyword = many1(letter()).map(CSSValue::Keyword);
 
     let em_length = (
         many1(digit()).map(|s: String| s.parse::<usize>().unwrap()),

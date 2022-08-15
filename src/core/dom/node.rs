@@ -40,7 +40,7 @@ impl ToString for Node {
                     .map(|node| node.to_string())
                     .collect::<Vec<_>>()
                     .join("");
-                if attrs != "" {
+                if !attrs.is_empty() {
                     format!("<{} {}>{}</{}>", e.tag_name, attrs, children, e.tag_name)
                 } else {
                     format!("<{}>{}</{}>", e.tag_name, children, e.tag_name)

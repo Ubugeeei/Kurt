@@ -26,10 +26,8 @@ where
 {
     let universal_selector = char('*').map(|_| SimpleSelector::UniversalSelector);
 
-    let class_selector =
-        (char('.'), many1(letter())).map(|(_, class_name)| SimpleSelector::ClassSelector {
-            class_name: class_name,
-        });
+    let class_selector = (char('.'), many1(letter()))
+        .map(|(_, class_name)| SimpleSelector::ClassSelector { class_name });
 
     let type_or_attribute_selector = (
         many1(letter()).skip(whitespaces()),
@@ -57,13 +55,13 @@ where
                     }
                 };
                 Ok(SimpleSelector::AttributeSelector {
-                    tag_name: tag_name,
-                    attribute: attribute,
-                    op: op,
-                    value: value,
+                    tag_name,
+                    attribute,
+                    op,
+                    value,
                 })
             }
-            None => Ok(SimpleSelector::TypeSelector { tag_name: tag_name }),
+            None => Ok(SimpleSelector::TypeSelector { tag_name }),
         });
 
     choice((

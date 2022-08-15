@@ -7,7 +7,7 @@ use cursive::{
 
 pub type ElementContainer = LinearLayout;
 
-pub fn create_element_container<'a>(layout: &LayoutBox<'a>) -> ElementContainer {
+pub fn create_element_container(layout: &LayoutBox<'_>) -> ElementContainer {
     let mut container = match layout.box_type {
         BoxType::NoneBox => {
             return LinearLayout::horizontal();
@@ -37,9 +37,9 @@ pub fn create_element_container<'a>(layout: &LayoutBox<'a>) -> ElementContainer 
             // For your information, CSS Text Module Level 3 specifies how to process whitespaces.
             // See https://www.w3.org/TR/css-text-3/#white-space-processing for further information.
             let text_to_display = t.data.clone();
-            let text_to_display = text_to_display.replace("\n", "");
+            let text_to_display = text_to_display.replace('\n', "");
             let text_to_display = text_to_display.trim();
-            if text_to_display != "" {
+            if !text_to_display.is_empty() {
                 vec![Box::new(TextView::new(text_to_display)) as Box<dyn View>]
             } else {
                 vec![]

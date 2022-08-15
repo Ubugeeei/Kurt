@@ -5,9 +5,9 @@ pub fn create_styled_document<'a>(
     document: &'a Document,
     stylesheet: &Stylesheet,
 ) -> StyledDocument<'a> {
-    let document_element = create_styled_node(&document.document_element, &stylesheet);
+    let document_element = create_styled_node(&document.document_element, stylesheet);
     StyledDocument {
-        document_element: document_element,
+        document_element,
     }
 }
 
@@ -24,7 +24,7 @@ fn create_styled_node<'a>(node: &'a Box<Node>, stylesheet: &Stylesheet) -> Style
     StyledNode {
         node_type: &node.node_type,
         properties: props,
-        children: children,
+        children,
     }
 }
 

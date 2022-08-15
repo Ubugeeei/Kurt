@@ -6,7 +6,7 @@ pub struct Stylesheet {
 }
 impl Stylesheet {
     pub fn new(rules: Vec<Rule>) -> Self {
-        Stylesheet { rules: rules }
+        Stylesheet { rules }
     }
 }
 
@@ -132,6 +132,6 @@ mod tests {
             .collect(),
             vec![],
         );
-        assert_eq!(SimpleSelector::UniversalSelector.matches(element), true);
+        assert!(SimpleSelector::UniversalSelector.matches(element));
     }
 }
