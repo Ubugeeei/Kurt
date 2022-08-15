@@ -6,9 +6,7 @@ pub fn create_styled_document<'a>(
     stylesheet: &Stylesheet,
 ) -> StyledDocument<'a> {
     let document_element = create_styled_node(&document.document_element, stylesheet);
-    StyledDocument {
-        document_element,
-    }
+    StyledDocument { document_element }
 }
 
 fn create_styled_node<'a>(node: &'a Box<Node>, stylesheet: &Stylesheet) -> StyledNode<'a> {
