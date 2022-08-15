@@ -7,13 +7,17 @@ use crate::core::{
 
 const HTML: &str = "\
     <body>\
-      <span class=\"hide\">hide</span>\
       <div id=\"main\" class=\"content\">\
-        <p>hello rust html parser!!</p>\
-        <p>hello rust html parser!!</p>\
-        <p>hello rust html parser!!</p>\
-        <p>hello rust html parser!!</p>\
-        <p>hello rust html parser!!</p>\
+        <p>hello rust css parser!!</p>\
+        <p class=\"hide\">hello rust css parser!!</p>\
+        <p class=\"hide\">hello rust css parser!!</p>\
+        <p class=\"hide\">hello rust css parser!!</p>\
+        <p class=\"hide\">hello rust css parser!!</p>\
+        <p class=\"hide\">hello rust css parser!!</p>\
+        <p>hello</p>\
+        <p>rust</p>\
+        <p>parser!!</p>\
+        \
       </div>\
     </body>\
 ";
@@ -47,20 +51,16 @@ const DEFAULT_STYLESHEET: &str = r#"
 fn main() {
     // parse html
     let dom = parse_html(HTML).unwrap();
-    dbg!(&dom);
 
     // parse css
     let styles = format!("{}\n{}", DEFAULT_STYLESHEET, CSS);
     let cssom = parse_css(styles).unwrap();
-    dbg!(&cssom);
 
     // create styled document from dom and cssom
     let styled_document = create_styled_document(&dom, &cssom);
-    dbg!(&styled_document);
 
     // calc layout
     let layout_document = create_layout_document(styled_document);
-    dbg!(&layout_document);
 
     // create box view
     let view = create_element_container(&layout_document.top_box);
@@ -68,5 +68,6 @@ fn main() {
     // rendering
     let mut siv = cursive::default();
     siv.add_fullscreen_layer(view);
+    siv.add_global_callback('q', |s| s.quit());
     siv.run();
 }
