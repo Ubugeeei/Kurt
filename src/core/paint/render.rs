@@ -1,59 +1,49 @@
-use crate::core::{BoxProps, BoxType, LayoutBox, NodeType};
-use cursive::{
-    // theme::BaseColor, // ColorStyle::background
-    view::View,
-    views::{LinearLayout, TextView},
-};
+use crate::core::LayoutBox;
+use sdl2::event::Event;
+use sdl2::image::{self, InitFlag};
+use sdl2::keyboard::Keycode;
+use sdl2::ttf;
 
-pub type ElementContainer = LinearLayout;
+use super::paint::{paint_base, paint_layout, PainterHeadPosition};
 
-pub fn create_element_container(layout: &LayoutBox<'_>) -> ElementContainer {
-    let mut container = match layout.box_type {
-        BoxType::NoneBox => {
-            return LinearLayout::horizontal();
-        }
-        BoxType::BlockBox => LinearLayout::vertical(),
-        BoxType::InlineBox | BoxType::AnonymousBox => LinearLayout::horizontal(),
-    };
+const HEADER_HEIGHT: u32 = 70;
 
-    // render the node of layout box
-    let elements = match layout.box_props {
-        Some(BoxProps {
-            node_type: NodeType::Element(ref element),
-            ..
-        }) => match element.tag_name.as_str() {
-            // "input" => vec![input::render(layout, element)],
-            _ => layout
-                .children
-                .iter()
-                .map(|child| Box::new(create_element_container(child)) as Box<dyn View>)
-                .collect(),
-        },
-        Some(BoxProps {
-            node_type: NodeType::Text(ref t),
-            ..
-        }) => {
-            // NOTE: This is puppy original behaviour, not a standard one.
-            // For your information, CSS Text Module Level 3 specifies how to process whitespaces.
-            // See https://www.w3.org/TR/css-text-3/#white-space-processing for further information.
-            let text_to_display = t.data.clone();
-            let text_to_display = text_to_display.replace('\n', "");
-            let text_to_display = text_to_display.trim();
-            if !text_to_display.is_empty() {
-                vec![Box::new(TextView::new(text_to_display)) as Box<dyn View>]
-            } else {
-                vec![]
+// TODO: render layout
+pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
+    let ttf_context = ttf::init().map_err(|e| e.to_string())?;
+    let _image_context = image::init(InitFlag::PNG | InitFlag::JPG)?;
+
+    let window = video_subsystem
+        .window("panel-pop", 1600, 1000)
+        .position_centered()
+        .build()
+        .map_err(|e| e.to_string())?;
+    let mut canvas = window
+        .into_canvas()
+        .software()
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let mut pos = PainterHeadPosition::new(0, HEADER_HEIGHT);
+    let _ = paint_base(&mut canvas);
+    let _ = paint_layout(&mut canvas, &ttf_context, layout, &mut pos);
+
+    'mainloop: loop {
+        for event in sdl_context.event_pump()?.poll_iter() {
+            match event {
+                // Quit if the window is closed
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Option::Some(Keycode::Escape),
+                    ..
+                } => break 'mainloop,
+
+                _ => {}
             }
         }
-        _ => layout
-            .children
-            .iter()
-            .map(|child| Box::new(create_element_container(child)) as Box<dyn View>)
-            .collect(),
-    };
-    for child in elements {
-        container.add_child(child);
     }
 
-    container
+    Ok(())
 }

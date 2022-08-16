@@ -108,7 +108,7 @@ pub enum CSSValue {
 }
 #[derive(Debug, PartialEq, Clone)]
 pub enum Unit {
-    Em,
+    Rem,
     Px,
     Percent,
 }

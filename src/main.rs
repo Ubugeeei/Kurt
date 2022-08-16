@@ -1,37 +1,50 @@
 mod core;
+
 use crate::core::{
     css::stylesheet::parse_css,
     html::parser::parse_html,
-    {create_element_container, create_layout_document, create_styled_document},
+    paint::render::render,
+    {create_layout_document, create_styled_document},
 };
+
+extern crate sdl2;
 
 const HTML: &str = "\
     <body>\
       <div id=\"main\" class=\"content\">\
-        <p>hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p>hello</p>\
-        <p>rust</p>\
-        <p>parser!!</p>\
-        \
+        <div class=\"message\">Hello, world!! My browser is working!</div>\
+        <p class=\"hide\">this is hide element</p>\
       </div>\
     </body>\
 ";
 
 const CSS: &str = r#"
+  body {
+    width: 1600px;
+    height: 1000px;
+  }
+
   .content {
-    width: 1024px;
-    font-size: 12px;
+    width: 1200px;
+    height: 768px;
+  }
+
+  .message {
+    width: 1200px;
+    height: 100px;
   }
 
   p {
-    font-size: 10px;
+    width: 256px;
+    height: 24px;
+  }
+
+  .fwb {
     font-weight: bold;
-    color: grey;
+  }
+
+  .red {
+    color: red;
   }
 
   .hide {
@@ -43,12 +56,23 @@ const DEFAULT_STYLESHEET: &str = r#"
   script, style {
     display: none;
   }
-  p, div {
+  body {
     display: block;
+    margin: 8px;
+  }
+  div {
+    display: block;
+  }
+  p {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 "#;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // parse html
     let dom = parse_html(HTML).unwrap();
 
@@ -62,12 +86,6 @@ fn main() {
     // calc layout
     let layout_document = create_layout_document(styled_document);
 
-    // create box view
-    let view = create_element_container(&layout_document.top_box);
-
-    // rendering
-    let mut siv = cursive::default();
-    siv.add_fullscreen_layer(view);
-    siv.add_global_callback('q', |s| s.quit());
-    siv.run();
+    // TODO: rendering
+    render(&layout_document.top_box)
 }

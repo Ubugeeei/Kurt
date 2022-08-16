@@ -40,9 +40,9 @@ where
 
     let em_length = (
         many1(digit()).map(|s: String| s.parse::<usize>().unwrap()),
-        string("em"),
+        string("rem"),
     )
-        .map(|(num, _unit)| CSSValue::Length((num, Unit::Em)));
+        .map(|(num, _unit)| CSSValue::Length((num, Unit::Rem)));
 
     let px_length = (
         many1(digit()).map(|s: String| s.parse::<usize>().unwrap()),
@@ -70,8 +70,8 @@ mod tests {
             Ok((CSSValue::Keyword("white".to_string()), ""))
         );
         assert_eq!(
-            css_value().parse("100em"),
-            Ok((CSSValue::Length((100usize, Unit::Em)), ""))
+            css_value().parse("100rem"),
+            Ok((CSSValue::Length((100usize, Unit::Rem)), ""))
         );
         assert_eq!(
             css_value().parse("100px"),
