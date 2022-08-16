@@ -4,36 +4,8 @@ version = "0.1.0"
 authors = ["Ubugeeei"]
 edition = "2018"
 
-[[cdylib]]
-name = "html_parser_modules"
-path = "src/html_parser/mod.rs"
-[[cdylib]]
-name = "parse_node"
-path = "src/html_parser/parse_node.rs"
-[[cdylib]]
-name = "dom_definition"
-path = "src/html_parser/dom.rs"
-[[cdylib]]
-name = "parse_attributes"
-path = "src/html_parser/parse_attributes.rs"
-[[cdylib]]
-name = "parse_tags"
-path = "src/html_parser/parse_tag.rs"
-
 [dependencies]
-log = "0.4"
-fern = "0.6"
-chrono = "0.4"
-clap-verbosity-flag = "0.4"
-structopt = "0.3.21"
 thiserror = "1.0"
 combine = "4.5.2"
-num-traits = "0.2"
-num-derive = "0.3"
-url = "2.2.1"
-reqwest = { version = "0.11", features = ["blocking"] }
-unicode-width = "0.1.8"
-rusty_v8 = "0.32.1"
-crossbeam-channel = "0.5.1"
-
+rusty_v8 = "0.22.1"
 sdl2 = { version = "0.35.0", features = ["ttf", "image", "gfx"] }

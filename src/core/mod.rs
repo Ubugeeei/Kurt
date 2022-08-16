@@ -15,3 +15,6 @@ pub use self::layout::*;
 
 pub mod paint;
 pub use self::paint::*;
+
+pub mod javascript;
+pub use self::javascript::*;
