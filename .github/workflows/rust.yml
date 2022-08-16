@@ -12,20 +12,34 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
 
     steps:
+    - uses: actions/checkout@v3
+
     - name: install_dependencies
       run: |
-        sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
-        sudo apt-get update -y -qq
-        sudo apt-get install libsdl2-dev
-    - uses: actions/checkout@v3
+        brew install rustup
+        rustup-init -y --default-toolchain stable 
+        brew install sdl2 sdl2_ttf sdl2_image sdl2_gfx
+
     - name: Check Format
-      run: cargo fmt --check
+      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cargo fmt --check
+
     - name: Lint
-      run: cargo clippy --all-targets --all-features --
+      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cargo clippy --all-targets --all-features --
+
     - name: Build
-      run: cargo build --release
+      run: |
+        export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cargo build --release
+
     - name: Run tests
-      run: cargo test
+      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
+        cargo test
