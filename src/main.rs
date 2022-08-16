@@ -12,30 +12,39 @@ extern crate sdl2;
 const HTML: &str = "\
     <body>\
       <div id=\"main\" class=\"content\">\
-        <p>hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p class=\"hide\">hello rust css parser!!</p>\
-        <p>hello</p>\
-        <p>rust</p>\
-        <p>parser!!</p>\
-        \
+        <div class=\"message\">Hello, world!! My browser is working!</div>\
+        <p class=\"hide\">this is hide element</p>\
       </div>\
     </body>\
 ";
 
 const CSS: &str = r#"
+  body {
+    width: 1600px;
+    height: 1000px;
+  }
+
   .content {
-    width: 1024px;
-    font-size: 12px;
+    width: 1200px;
+    height: 768px;
+  }
+
+  .message {
+    width: 1200px;
+    height: 100px;
   }
 
   p {
-    font-size: 10px;
+    width: 256px;
+    height: 24px;
+  }
+
+  .fwb {
     font-weight: bold;
-    color: grey;
+  }
+
+  .red {
+    color: red;
   }
 
   .hide {
