@@ -2,8 +2,7 @@ use crate::core::LayoutBox;
 use sdl2::event::Event;
 use sdl2::image::{self, InitFlag};
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use sdl2::ttf::{self};
+use sdl2::ttf;
 
 use super::paint::{paint_base, paint_layout, PainterHeadPosition};
 
@@ -40,16 +39,6 @@ pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
                     keycode: Option::Some(Keycode::Escape),
                     ..
                 } => break 'mainloop,
-
-                // change background color
-                Event::KeyUp {
-                    keycode: Option::Some(Keycode::Space),
-                    ..
-                } => {
-                    canvas.set_draw_color(Color::RGB(0, 0, 0));
-                    canvas.clear();
-                    canvas.present();
-                }
 
                 _ => {}
             }
