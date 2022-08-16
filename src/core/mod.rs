@@ -13,5 +13,8 @@ pub use self::styled_node::*;
 mod layout;
 pub use self::layout::*;
 
-pub mod paint;
-pub use self::paint::*;
+pub mod render;
+pub use self::render::*;
+
+pub mod javascript;
+pub use self::javascript::*;

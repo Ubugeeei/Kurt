@@ -3,20 +3,35 @@ mod core;
 use crate::core::{
     css::stylesheet::parse_css,
     html::parser::parse_html,
-    paint::render::render,
+    render::render::render,
+    runtime::JavaScriptRuntime,
     {create_layout_document, create_styled_document},
 };
 
 extern crate sdl2;
 
-const HTML: &str = "\
-    <body>\
-      <div id=\"main\" class=\"content\">\
-        <div class=\"message\">Hello, world!! My browser is working!</div>\
-        <p class=\"hide\">this is hide element</p>\
-      </div>\
-    </body>\
-";
+const HTML: &str = r#"
+    <body>
+      <div id="main" class="content">
+        <div class="message">Hello, world!! My browser is working!</div>
+        <p class="hide">this is hide element</p>
+      </div>
+
+      <script>
+        let count = 6;
+        const double = n => n * 2;
+        double(count)
+      </script>
+
+      <script>
+        const factorical = num => {
+          if (num === 0) return 1;
+          return num * factorical(num-1);
+        };
+        factorical(5)
+      </script>
+    </body>
+"#;
 
 const CSS: &str = r#"
   body {
@@ -86,6 +101,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // calc layout
     let layout_document = create_layout_document(styled_document);
 
+    // create JavaScript runtime
+    let mut javascript_runtime = JavaScriptRuntime::new();
+
     // TODO: rendering
-    render(&layout_document.top_box)
+    render(&layout_document.top_box, &dom, &mut javascript_runtime)
 }
