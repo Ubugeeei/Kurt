@@ -5,9 +5,4 @@
 $ cargo run
 ```
 
-
-
-
-
-https://user-images.githubusercontent.com/71201308/184812523-5b3ad22d-4982-4061-8455-db5ef337324c.mov
-
+https://user-images.githubusercontent.com/71201308/184876622-2c15ba58-3e76-4104-8007-1ae178ec5a3e.mov
