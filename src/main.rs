@@ -3,7 +3,7 @@ mod core;
 use crate::core::{
     css::stylesheet::parse_css,
     html::parser::parse_html,
-    paint::render::render,
+    render::render::render,
     {create_layout_document, create_styled_document},
 };
 
