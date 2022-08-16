@@ -6,7 +6,7 @@ use sdl2::ttf;
 
 use super::paint::{paint_base, paint_layout, PainterHeadPosition};
 
-const HEADER_HEIGHT: u32 = 70;
+const HEADER_HEIGHT: u32 = 60;
 
 // TODO: render layout
 pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {

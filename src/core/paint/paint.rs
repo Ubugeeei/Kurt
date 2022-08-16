@@ -24,8 +24,9 @@ pub fn paint_base(canvas: &mut Canvas<Window>) -> Result<(), Box<dyn std::error:
     canvas.present();
 
     // header
+    // FIXME: magic number
     canvas.set_draw_color(Color::RGB(60, 60, 60));
-    let _ = canvas.fill_rect(Rect::new(0, 0, 1600, 70));
+    let _ = canvas.fill_rect(Rect::new(0, 0, 1600, 58));
     canvas.present();
 
     // TODO: cursor
@@ -97,7 +98,7 @@ pub fn paint_layout(
                     let target = Rect::new(
                         pos.x as i32,
                         pos.y as i32,
-                        (txt_node.data.chars().count() as u32) * 12,
+                        (txt_node.data.chars().count() as u32) * 10,
                         24,
                     );
 
@@ -158,7 +159,7 @@ pub fn paint_layout(
                     let target = Rect::new(
                         pos.x as i32,
                         pos.y as i32,
-                        (txt_node.data.chars().count() as u32) * 12,
+                        (txt_node.data.chars().count() as u32) * 10,
                         24,
                     );
                     canvas.copy(&texture, None, Some(target))?;
