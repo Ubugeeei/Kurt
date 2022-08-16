@@ -31,21 +31,6 @@ pub fn render(layout: &LayoutBox) -> Result<(), Box<dyn std::error::Error>> {
     let _ = paint_base(&mut canvas);
     let _ = paint_layout(&mut canvas, &ttf_context, layout, &mut pos);
 
-    // FIXME: 仮
-    // let texture_creator = canvas.texture_creator();
-    // canvas.set_draw_color(Color::RGB(0, 0, 0));
-    // let surface = ttf_context
-    //     .load_font("./assets/Arial.ttf", 512)?
-    //     .render("Hello, world! My browser is working!")
-    //     .blended(Color::RGB(0, 0, 0))
-    //     .map_err(|e| e.to_string())?;
-    // let texture = texture_creator
-    //     .create_texture_from_surface(&surface)
-    //     .map_err(|e| e.to_string())?;
-    // let target = Rect::new(10, 80, 360, 24);
-    // canvas.copy(&texture, None, Some(target))?;
-    // canvas.present();
-
     'mainloop: loop {
         for event in sdl_context.event_pump()?.poll_iter() {
             match event {
