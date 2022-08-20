@@ -1,6 +1,6 @@
 # Kurt Browser
 A toy web browser in Rust. (minimal childish implementation)  
-HTML parser, CSS parser, layout enginge, renderer.  
+HTML parser, CSS parser, layout engine, renderer.  
 
 ## Deps
 - paint: [sdl2](https://github.com/Rust-SDL2/rust-sdl2)
