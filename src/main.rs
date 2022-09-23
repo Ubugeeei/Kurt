@@ -1,9 +1,12 @@
 mod core;
+
+use crate::core::glasper::js::JavaScriptRuntime;
+
 use crate::core::{
     css::stylesheet::parse_css,
     html::parser::parse_html,
     render::render::render,
-    runtime::JavaScriptRuntime,
+    // runtime::JavaScriptRuntime,
     {create_layout_document, create_styled_document},
 };
 

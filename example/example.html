@@ -1,20 +1,23 @@
 <body>
-  <div id="main" class="content">
-    <div class="message">Hello, world!! My browser is working!</div>
-    <p class="hide">this is hide element</p>
-  </div>
+	<div id="main" class="content">
+		<div class="message">Hello, world!! My browser is working!</div>
+		<p class="hide">this is hide element</p>
+	</div>
 
-  <script>
-    let count = 6;
-    const double = n => n * 2;
-    double(count)
-  </script>
+	<script>
+		// Closure
+		let count = 6;
+		const double = function (n) {
+			return n * 2;
+		};
+		console.log("double(count):", double(count));
 
-  <script>
-    const factorical = num => {
-      if (num === 0) return 1;
-      return num * factorical(num-1);
-    };
-    factorical(5)
-  </script>
+		// Recursion
+		const factorial = function (num) {
+			if (num === 0) return 1;
+			return num * factorial(num - 1);
+		};
+		const res = factorial(5);
+		console.log("factorial(5):", res);
+	</script>
 </body>
