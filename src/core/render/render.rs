@@ -1,4 +1,5 @@
-use crate::core::runtime::JavaScriptRuntime;
+use crate::core::glasper::js::JavaScriptRuntime;
+// use crate::core::runtime::JavaScriptRuntime;
 use crate::core::{Document, LayoutBox, Node, NodeType};
 use sdl2::event::Event;
 use sdl2::image::{self, InitFlag};
@@ -72,8 +73,7 @@ fn execute_javascript(js_runtime: &mut JavaScriptRuntime, dom: &Document) {
                         match child.node_type {
                             NodeType::Text(ref text) => {
                                 let script = text.data.clone();
-                                let result = js_runtime.execute("", &script);
-                                println!("[\x1b[33mJavaScript executed\x1b[m]: {:?}", result);
+                                let _ = js_runtime.execute(script);
                             }
                             _ => (),
                         }
