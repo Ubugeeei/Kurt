@@ -1,21 +1,12 @@
+use crate::core::css::stylesheet::parse_css;
 use crate::core::fetch::fetch_html;
 use crate::core::glasper::js::JavaScriptRuntime;
 use crate::core::html::parser::parse_html;
-// use crate::core::runtime::JavaScriptRuntime;
-use crate::core::{Document, Node, NodeType};
+use crate::core::{create_layout_document, create_styled_document, Document, Node, NodeType};
 
 use gtk::gio::ApplicationFlags;
 use gtk::prelude::*;
 use gtk::Application;
-
-// use sdl2::event::Event;
-// use sdl2::image::{self, InitFlag};
-// use sdl2::keyboard::Keycode;
-// use sdl2::ttf;
-
-// use super::paint::{paint_base, paint_layout, PainterHeadPosition};
-
-// const HEADER_HEIGHT: u32 = 60;
 
 // TODO: render layout
 pub fn render() -> Result<(), Box<dyn std::error::Error>> {
@@ -37,7 +28,6 @@ fn build_gui(app: &gtk::Application) {
         .build();
 
     let header_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    // header_container.set_css_classes(&vec!["header-container"]);
     window.set_child(Some(&header_container));
 
     let header_search_bar = gtk::Entry::builder()
@@ -52,33 +42,52 @@ fn build_gui(app: &gtk::Application) {
         let url = header_search_bar.text().to_string();
         let html = fetch_html(&url);
         println!("---------------------------------------------------------");
-        println!("[Fetch HTML: (url: {})]", url);
+        println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
         println!("---------------------------------------------------------");
+        println!("content");
         println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
-        println!("---------------------------------------------------------");
 
         let document = parse_html(&html).unwrap();
         println!("---------------------------------------------------------");
-        println!("[Parse Document]");
+        println!("[\x1b[32mParse Document\x1b[0m]");
         println!("---------------------------------------------------------");
+        println!("content");
         println!(
             "\n\x1b[30m{}\n...\x1b[0m\n",
             &format!("{:?}", document)[..100]
         );
+
+        // TODO: parse css from html
+        let default_stylesheets = std::fs::read_to_string("./assets/css/default.css").unwrap();
+        let cssom = parse_css(default_stylesheets).unwrap();
         println!("---------------------------------------------------------");
+        println!("[\x1b[32mParse CSSOM: (default css)\x1b[0m]");
+        println!("---------------------------------------------------------");
+        println!("content");
+        println!("\n\x1b[30m{}\n...\x1b[0m\n", &format!("{:?}", cssom)[..100]);
+
+        let styled_document = create_styled_document(&document, &cssom);
+        let layout_document = create_layout_document(styled_document);
+        println!("---------------------------------------------------------");
+        println!("[\x1b[32mGenerate Layout Document\x1b[0m]");
+        println!("---------------------------------------------------------");
+        println!("content");
+        println!(
+            "\n\x1b[30m{}\n...\x1b[0m\n",
+            &format!("{:?}", layout_document)[..100]
+        );
 
         println!("---------------------------------------------------------");
-        println!("[JavaScript Execution]");
+        println!("[\x1b[32mJavaScript Execution\x1b[0m]");
         println!("---------------------------------------------------------");
+        println!("log");
         let mut javascript_runtime = JavaScriptRuntime::new();
         execute_javascript(&mut javascript_runtime, &document);
-        println!("---------------------------------------------------------");
 
         // TODO: build layout
     });
 
     header_container.append(&header_search_bar);
-
     window.present();
 }
 
