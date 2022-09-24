@@ -1,5 +1,9 @@
+use crate::core::{
+    cssom::Stylesheet,
+    dom::{Document, Node},
+};
+
 use super::{PropertyMap, StyledDocument, StyledNode};
-use crate::core::{Document, Node, Stylesheet};
 
 pub fn create_styled_document<'a>(
     document: &'a Document,

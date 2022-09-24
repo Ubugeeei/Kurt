@@ -1,4 +1,4 @@
-use crate::core::{NodeType, PropertyMap};
+use crate::core::{dom::NodeType, styled_node::PropertyMap};
 
 #[derive(Debug, PartialEq)]
 pub struct LayoutDocument<'a> {

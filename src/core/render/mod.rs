@@ -1,4 +1,4 @@
-pub mod render;
-pub use self::render::*;
+pub mod renderer;
+pub use self::renderer::*;
 
 pub mod paint;

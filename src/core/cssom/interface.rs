@@ -1,4 +1,4 @@
-use crate::core::{Node, NodeType};
+use crate::core::dom::{Node, NodeType};
 
 #[derive(Debug, PartialEq)]
 pub struct Stylesheet {
@@ -115,9 +115,8 @@ pub enum Unit {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::Element;
-
     use super::*;
+    use crate::core::dom::Element;
 
     #[test]
     fn test_universal_selector_behaviour() {

@@ -1,4 +1,11 @@
-use crate::core::{BoxType, CSSValue, LayoutBox, NodeType, PropertyMap, Unit};
+#![allow(unused_variables)]
+
+use crate::core::{
+    cssom::{CSSValue, Unit},
+    dom::NodeType,
+    layout::{BoxType, LayoutBox},
+    styled_node::PropertyMap,
+};
 use gtk::prelude::*;
 
 pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
@@ -92,7 +99,7 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
 pub fn get_color(props: &PropertyMap) -> &str {
     match props.get("color") {
         Some(v) => match v {
-            CSSValue::Keyword(k) => k,
+            CSSValue::Keyword(k) => &k,
             // set to default
             CSSValue::Length(_) => "black",
         },
@@ -136,7 +143,7 @@ pub fn get_height(props: &PropertyMap) -> u32 {
 pub fn get_background_color(props: &PropertyMap) -> &str {
     match props.get("background-color") {
         Some(v) => match v {
-            CSSValue::Keyword(k) => k,
+            CSSValue::Keyword(k) => &k,
             // set to default
             CSSValue::Length(_) => "white",
         },

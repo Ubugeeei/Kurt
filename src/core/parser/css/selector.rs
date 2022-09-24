@@ -1,5 +1,5 @@
 use crate::core::cssom::{AttributeSelectorOp, Selector, SimpleSelector};
-use crate::core::utils::whitespaces;
+use crate::core::parser::utils::whitespaces;
 use combine::{
     choice,
     error::StreamError,
