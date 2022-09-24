@@ -29,13 +29,14 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
                  * render text
                  */
                 NodeType::Text(txt_node) => {
-                    // css props
-                    let color = get_color(&props.properties); // TODO: set color
-                    let text = gtk::Text::builder()
-                        .text(txt_node.data.as_str())
-                        .css_classes(vec!["kurt-text-default".to_string()])
-                        .build();
-                    main_container.append(&text);
+                    if !txt_node.data.trim().is_empty() {
+                        let color = get_color(&props.properties); // TODO: set color
+                        let text = gtk::Text::builder()
+                            .text(txt_node.data.as_str())
+                            .css_classes(vec!["kurt-text-default".to_string()])
+                            .build();
+                        main_container.append(&text);
+                    }
                 }
 
                 /*
@@ -72,13 +73,15 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
                  * render text
                  */
                 NodeType::Text(txt_node) => {
-                    // css props
-                    let color = get_color(&props.properties); // TODO: set color
-                    let text = gtk::Text::builder()
-                        .text(txt_node.data.as_str())
-                        .css_classes(vec!["kurt-text-default".to_string()])
-                        .build();
-                    main_container.append(&text);
+                    if !txt_node.data.trim().is_empty() {
+                        let color = get_color(&props.properties); // TODO: set color
+                        let text = gtk::Text::builder()
+                            .text(txt_node.data.as_str())
+                            .css_classes(vec!["kurt-text-default".to_string()])
+                            .build();
+                        println!("append!! {} ", txt_node.data);
+                        main_container.append(&text);
+                    }
                 }
 
                 /*
