@@ -75,7 +75,7 @@ fn build_gui(app: &gtk::Application) {
         println!("content");
         println!(
             "\n\x1b[30m{}\n...\x1b[0m\n",
-            &format!("{:?}", layout_document)[..100]
+            &format!("{:?}", layout_document.top_box)[..100]
         );
 
         println!("---------------------------------------------------------");
@@ -88,7 +88,7 @@ fn build_gui(app: &gtk::Application) {
         println!("---------------------------------------------------------");
         println!("[\x1b[32mPaint Content\x1b[0m]");
         println!("---------------------------------------------------------");
-        crate::core::paint::paint_document(&layout_document, &main_container);
+        crate::core::paint::paint_document(&layout_document.top_box, &main_container);
         println!("done.");
     }));
 
@@ -108,6 +108,11 @@ fn load_css() {
                 outline: none;
                 font-size: 15px;
                 color: #888;
+            }
+
+            .kurt-text-default {
+                font-size: 15px;
+                color: #222;
             }
     "#
         .as_bytes(),
