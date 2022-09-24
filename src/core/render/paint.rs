@@ -79,7 +79,6 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
                             .text(txt_node.data.as_str())
                             .css_classes(vec!["kurt-text-default".to_string()])
                             .build();
-                        println!("append!! {} ", txt_node.data);
                         main_container.append(&text);
                     }
                 }
