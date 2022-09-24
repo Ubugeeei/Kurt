@@ -11,7 +11,14 @@ use gtk::prelude::*;
 
 use crate::core::LayoutDocument;
 
-pub fn paint_document(layout: &LayoutDocument, parent_box: &gtk::ApplicationWindow) {}
+pub fn paint_document(_layout: &LayoutDocument, main_container: &gtk::Box) {
+    // TODO: append layout document to window
+    let text = gtk::Label::builder()
+        .label("hello")
+        .css_classes(vec!["text".to_string()])
+        .build();
+    main_container.append(&text);
+}
 
 // pub fn paint_base(canvas: &mut Canvas<Window>) -> Result<(), Box<dyn std::error::Error>> {
 //     // background

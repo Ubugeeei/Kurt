@@ -85,12 +85,11 @@ fn build_gui(app: &gtk::Application) {
         let mut javascript_runtime = JavaScriptRuntime::new();
         execute_javascript(&mut javascript_runtime, &document);
 
-        // TODO: append layout document to window
-        let text = gtk::Label::builder()
-            .label(&url)
-            .css_classes(vec!["text".to_string()])
-            .build();
-        main_container.append(&text);
+        println!("---------------------------------------------------------");
+        println!("[\x1b[32mPaint Content\x1b[0m]");
+        println!("---------------------------------------------------------");
+        crate::core::paint::paint_document(&layout_document, &main_container);
+        println!("done.");
     }));
 
     main_container.append(&header_search_bar);
