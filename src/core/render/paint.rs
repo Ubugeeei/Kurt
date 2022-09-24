@@ -1,270 +1,336 @@
-use crate::core::{BoxType, CSSValue, LayoutBox, NodeType, PropertyMap, Unit};
-use sdl2::gfx::primitives::DrawRenderer;
-use sdl2::image::LoadTexture;
-use sdl2::pixels::Color;
-use sdl2::rect::Rect;
-use sdl2::render::Canvas;
-use sdl2::ttf::Sdl2TtfContext;
-use sdl2::video::Window;
+// use crate::core::{BoxType, CSSValue, LayoutBox, NodeType, PropertyMap, Unit};
+// use sdl2::gfx::primitives::DrawRenderer;
+// use sdl2::image::LoadTexture;
+// use sdl2::pixels::Color;
+// use sdl2::rect::Rect;
+// use sdl2::render::Canvas;
+// use sdl2::ttf::Sdl2TtfContext;
+// use sdl2::video::Window;
 
-pub struct PainterHeadPosition {
-    pub x: u32,
-    pub y: u32,
-}
-impl PainterHeadPosition {
-    pub fn new(x: u32, y: u32) -> PainterHeadPosition {
-        PainterHeadPosition { x, y }
-    }
-}
+use gtk::prelude::*;
 
-pub fn paint_base(canvas: &mut Canvas<Window>) -> Result<(), Box<dyn std::error::Error>> {
-    // background
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
-    canvas.clear();
-    canvas.present();
+// pub struct PainterHeadPosition {
+//     pub x: u32,
+//     pub y: u32,
+// }
+// impl PainterHeadPosition {
+//     pub fn new(x: u32, y: u32) -> PainterHeadPosition {
+//         PainterHeadPosition { x, y }
+//     }
+// }
 
-    // header
-    // FIXME: magic number
-    canvas.set_draw_color(Color::RGB(60, 60, 60));
-    let _ = canvas.fill_rect(Rect::new(0, 0, 1600, 58));
-    canvas.present();
-
-    // TODO: cursor
-    canvas.set_draw_color(Color::RGB(30, 30, 30));
-    let _ = canvas.fill_rect(Rect::new(120, 10, 1000, 30));
-    canvas.present();
-    let _ = canvas.filled_circle(121, 25, 15, Color::RGB(30, 30, 30));
-    canvas.present();
-    let _ = canvas.filled_circle(1119, 25, 15, Color::RGB(30, 30, 30));
-    canvas.present();
-
-    let texture_creator = canvas.texture_creator();
-    let texture = texture_creator.load_texture("./assets/img/arrow-left.png")?;
-    canvas.copy(&texture, None, Rect::new(10, 15, 20, 24))?;
-    canvas.present();
-    let texture = texture_creator.load_texture("./assets/img/arrow-right.png")?;
-    canvas.copy(&texture, None, Rect::new(40, 15, 20, 24))?;
-    canvas.present();
-    let texture = texture_creator.load_texture("./assets/img/reload.png")?;
-    canvas.copy(&texture, None, Rect::new(70, 15, 20, 24))?;
-    canvas.present();
-    Ok(())
+pub fn paint(app: &gtk::Application) {
+    app.connect_startup(|_| load_css());
+    app.connect_activate(build_gui);
+    app.run();
 }
 
-pub fn paint_layout(
-    canvas: &mut Canvas<Window>,
-    ttf_context: &Sdl2TtfContext,
-    layout: &LayoutBox,
-    pos: &mut PainterHeadPosition,
-) -> Result<(), Box<dyn std::error::Error>> {
-    match layout.box_type {
-        // if displfay none,  no painting
-        BoxType::NoneBox => return Ok(()),
+fn build_gui(app: &gtk::Application) {
+    // create the main window
+    let window = gtk::ApplicationWindow::builder()
+        .application(app)
+        .title("gtk input")
+        .width_request(1600)
+        .height_request(1000)
+        .build();
 
-        // paint
-        BoxType::AnonymousBox => {
-            for child in layout.children.iter() {
-                let _ = paint_layout(canvas, ttf_context, child, pos);
+    let header_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    window.set_child(Some(&header_container));
+
+    let header_search_bar = gtk::Entry::builder()
+        .margin_top(10)
+        .margin_start(10)
+        .margin_end(10)
+        .css_classes(vec!["input".to_string()])
+        .build();
+
+    // handle the input
+    header_search_bar.connect_changed(move |header_search_bar| {
+        println!("Input field changed: {}", header_search_bar.text());
+    });
+
+    header_search_bar.connect_activate(move |_| {
+        println!("Enter Key pressed!");
+    });
+
+    header_container.append(&header_search_bar);
+
+    window.present();
+}
+
+fn load_css() {
+    // Load the CSS file and add it to the provider
+    let provider = gtk::CssProvider::new();
+    provider.load_from_data(
+        r#"
+            .input {
+                border-radius: 50px;
+                padding-left: 10px;
+                padding-right: 10px;
+                outline: none;
+                font-size: 15px;
+                color: #888;
             }
-        }
+    "#
+        .as_bytes(),
+    );
 
-        BoxType::BlockBox => {
-            let props = match layout.box_props {
-                Some(ref props) => props,
-                _ => return Ok(()),
-            };
-            match props.node_type {
-                /*
-                 * render text
-                 */
-                NodeType::Text(txt_node) => {
-                    // css props
-                    let color = get_color(&props.properties);
-
-                    let texture_creator = canvas.texture_creator();
-                    // TODO: get color from styles
-                    canvas.set_draw_color(color);
-                    let surface = ttf_context
-                        // TODO: get font-family from styles
-                        .load_font("./assets/Arial.ttf", 512)?
-                        .render(&txt_node.data)
-                        .blended(color)
-                        .map_err(|e| e.to_string())?;
-
-                    let texture = texture_creator
-                        .create_texture_from_surface(&surface)
-                        .map_err(|e| e.to_string())?;
-
-                    let target = Rect::new(
-                        pos.x as i32,
-                        pos.y as i32,
-                        (txt_node.data.chars().count() as u32) * 10,
-                        24,
-                    );
-
-                    canvas.copy(&texture, None, Some(target))?;
-                    canvas.present();
-                }
-
-                /*
-                 * render nodep
-                 */
-                NodeType::Element(_elem_node) => {
-                    // css props
-                    let width = get_width(&props.properties);
-                    let height = get_height(&props.properties);
-                    let background_color = get_background_color(&props.properties);
-
-                    canvas.set_draw_color(background_color);
-                    let _ = canvas.fill_rect(Rect::new(pos.x as i32, pos.y as i32, width, height));
-                    canvas.present();
-
-                    // TODO: control brother x, y
-                    // pos.x += width;
-                    // pos.y += height;
-
-                    for child in layout.children.iter() {
-                        paint_layout(canvas, ttf_context, child, pos)?;
-                    }
-                }
-            }
-        }
-
-        BoxType::InlineBox => {
-            let props = match layout.box_props {
-                Some(ref props) => props,
-                _ => return Ok(()),
-            };
-
-            // css props
-            let color = get_color(&props.properties);
-            let background_color = get_background_color(&props.properties);
-
-            match props.node_type {
-                /*
-                 * render text
-                 */
-                NodeType::Text(txt_node) => {
-                    let texture_creator = canvas.texture_creator();
-                    let surface = ttf_context
-                        // TODO: get font-family from styles
-                        .load_font("./assets/Arial.ttf", 512)?
-                        .render(&txt_node.data)
-                        .blended(color)
-                        .map_err(|e| e.to_string())?;
-                    let texture = texture_creator
-                        .create_texture_from_surface(&surface)
-                        .map_err(|e| e.to_string())?;
-                    // FIXME: 24: get by font-size
-                    let target = Rect::new(
-                        pos.x as i32,
-                        pos.y as i32,
-                        (txt_node.data.chars().count() as u32) * 10,
-                        24,
-                    );
-                    canvas.copy(&texture, None, Some(target))?;
-                    canvas.present();
-                }
-
-                /*
-                 * render nodep
-                 */
-                NodeType::Element(_elem_node) => {
-                    canvas.set_draw_color(background_color);
-                    // FIXME: 1600. 24
-                    let _ = canvas.fill_rect(Rect::new(pos.x as i32, pos.y as i32, 1600, 24));
-                    canvas.present();
-
-                    // TODO: control brother x, y
-                    // pos.x += width;
-                    // pos.y += height;
-
-                    for child in layout.children.iter() {
-                        let _ = paint_layout(canvas, ttf_context, child, pos);
-                    }
-                }
-            }
-        }
-    }
-    Ok(())
+    // Add the provider to the default screen
+    gtk::StyleContext::add_provider_for_display(
+        &gtk::gdk::Display::default().expect("Could not connect to a display."),
+        &provider,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
 }
 
-fn get_width(props: &PropertyMap) -> u32 {
-    match props.get("width") {
-        Some(v) => match v {
-            CSSValue::Length(l) => match l.1 {
-                Unit::Px => l.0 as u32,
-                Unit::Rem => (l.0 * 16) as u32,
-                Unit::Percent => todo!("todo get parent width"),
-            },
-            // invalid w1idth value
-            // set to default 128
-            CSSValue::Keyword(_) => 128 as u32,
-        },
-        None => todo!("get_width: auto compute. at {:?}", &props),
-    }
-}
+// pub fn paint_base(canvas: &mut Canvas<Window>) -> Result<(), Box<dyn std::error::Error>> {
+//     // background
+//     canvas.set_draw_color(Color::RGB(255, 255, 255));
+//     canvas.clear();
+//     canvas.present();
 
-pub fn get_height(props: &PropertyMap) -> u32 {
-    match props.get("height") {
-        Some(v) => match v {
-            CSSValue::Length(l) => match l.1 {
-                Unit::Px => l.0 as u32,
-                Unit::Rem => (l.0 * 16) as u32,
-                Unit::Percent => todo!("todo get parent width"),
-            },
-            // invalid w1idth value
-            // set to default 24
-            CSSValue::Keyword(_) => 24 as u32,
-        },
-        None => todo!("get_height: auto compute. at {:?}", &props),
-    }
-}
+//     // header
+//     // FIXME: magic number
+//     canvas.set_draw_color(Color::RGB(60, 60, 60));
+//     let _ = canvas.fill_rect(Rect::new(0, 0, 1600, 58));
+//     canvas.present();
 
-pub fn get_color(props: &PropertyMap) -> Color {
-    match props.get("color") {
-        Some(v) => match v {
-            CSSValue::Keyword(k) => match &**k {
-                "red" => Color::RED,
-                "green" => Color::GREEN,
-                "blue" => Color::BLUE,
-                "black" => Color::BLACK,
-                "white" => Color::WHITE,
-                "yellow" => Color::YELLOW,
-                "cyan" => Color::CYAN,
-                "magenta" => Color::MAGENTA,
-                _ => {
-                    todo!("rgb, rgba, hex")
-                }
-            },
-            // set to default
-            CSSValue::Length(_) => Color::BLACK,
-        },
-        // set to default
-        None => Color::BLACK,
-    }
-}
+//     // TODO: cursor
+//     canvas.set_draw_color(Color::RGB(30, 30, 30));
+//     let _ = canvas.fill_rect(Rect::new(120, 10, 1000, 30));
+//     canvas.present();
+//     let _ = canvas.filled_circle(121, 25, 15, Color::RGB(30, 30, 30));
+//     canvas.present();
+//     let _ = canvas.filled_circle(1119, 25, 15, Color::RGB(30, 30, 30));
+//     canvas.present();
 
-pub fn get_background_color(props: &PropertyMap) -> Color {
-    match props.get("background-color") {
-        Some(v) => match v {
-            CSSValue::Keyword(k) => match &**k {
-                "red" => Color::RED,
-                "green" => Color::GREEN,
-                "blue" => Color::BLUE,
-                "black" => Color::BLACK,
-                "white" => Color::WHITE,
-                "yellow" => Color::YELLOW,
-                "cyan" => Color::CYAN,
-                "magenta" => Color::MAGENTA,
-                _ => {
-                    todo!("rgb, rgba, hex")
-                }
-            },
-            // set to default
-            CSSValue::Length(_) => Color::WHITE,
-        },
-        // set to default
-        None => Color::WHITE,
-    }
-}
+//     let texture_creator = canvas.texture_creator();
+//     let texture = texture_creator.load_texture("./assets/img/arrow-left.png")?;
+//     canvas.copy(&texture, None, Rect::new(10, 15, 20, 24))?;
+//     canvas.present();
+//     let texture = texture_creator.load_texture("./assets/img/arrow-right.png")?;
+//     canvas.copy(&texture, None, Rect::new(40, 15, 20, 24))?;
+//     canvas.present();
+//     let texture = texture_creator.load_texture("./assets/img/reload.png")?;
+//     canvas.copy(&texture, None, Rect::new(70, 15, 20, 24))?;
+//     canvas.present();
+//     Ok(())
+// }
+
+// pub fn paint_layout(
+//     canvas: &mut Canvas<Window>,
+//     ttf_context: &Sdl2TtfContext,
+//     layout: &LayoutBox,
+//     pos: &mut PainterHeadPosition,
+// ) -> Result<(), Box<dyn std::error::Error>> {
+//     match layout.box_type {
+//         // if displfay none,  no painting
+//         BoxType::NoneBox => return Ok(()),
+
+//         // paint
+//         BoxType::AnonymousBox => {
+//             for child in layout.children.iter() {
+//                 let _ = paint_layout(canvas, ttf_context, child, pos);
+//             }
+//         }
+
+//         BoxType::BlockBox => {
+//             let props = match layout.box_props {
+//                 Some(ref props) => props,
+//                 _ => return Ok(()),
+//             };
+//             match props.node_type {
+//                 /*
+//                  * render text
+//                  */
+//                 NodeType::Text(txt_node) => {
+//                     // css props
+//                     let color = get_color(&props.properties);
+
+//                     let texture_creator = canvas.texture_creator();
+//                     // TODO: get color from styles
+//                     canvas.set_draw_color(color);
+//                     let surface = ttf_context
+//                         // TODO: get font-family from styles
+//                         .load_font("./assets/Arial.ttf", 512)?
+//                         .render(&txt_node.data)
+//                         .blended(color)
+//                         .map_err(|e| e.to_string())?;
+
+//                     let texture = texture_creator
+//                         .create_texture_from_surface(&surface)
+//                         .map_err(|e| e.to_string())?;
+
+//                     let target = Rect::new(
+//                         pos.x as i32,
+//                         pos.y as i32,
+//                         (txt_node.data.chars().count() as u32) * 10,
+//                         24,
+//                     );
+
+//                     canvas.copy(&texture, None, Some(target))?;
+//                     canvas.present();
+//                 }
+
+//                 /*
+//                  * render nodep
+//                  */
+//                 NodeType::Element(_elem_node) => {
+//                     // css props
+//                     let width = get_width(&props.properties);
+//                     let height = get_height(&props.properties);
+//                     let background_color = get_background_color(&props.properties);
+
+//                     canvas.set_draw_color(background_color);
+//                     let _ = canvas.fill_rect(Rect::new(pos.x as i32, pos.y as i32, width, height));
+//                     canvas.present();
+
+//                     // TODO: control brother x, y
+//                     // pos.x += width;
+//                     // pos.y += height;
+
+//                     for child in layout.children.iter() {
+//                         paint_layout(canvas, ttf_context, child, pos)?;
+//                     }
+//                 }
+//             }
+//         }
+
+//         BoxType::InlineBox => {
+//             let props = match layout.box_props {
+//                 Some(ref props) => props,
+//                 _ => return Ok(()),
+//             };
+
+//             // css props
+//             let color = get_color(&props.properties);
+//             let background_color = get_background_color(&props.properties);
+
+//             match props.node_type {
+//                 /*
+//                  * render text
+//                  */
+//                 NodeType::Text(txt_node) => {
+//                     let texture_creator = canvas.texture_creator();
+//                     let surface = ttf_context
+//                         // TODO: get font-family from styles
+//                         .load_font("./assets/Arial.ttf", 512)?
+//                         .render(&txt_node.data)
+//                         .blended(color)
+//                         .map_err(|e| e.to_string())?;
+//                     let texture = texture_creator
+//                         .create_texture_from_surface(&surface)
+//                         .map_err(|e| e.to_string())?;
+//                     // FIXME: 24: get by font-size
+//                     let target = Rect::new(
+//                         pos.x as i32,
+//                         pos.y as i32,
+//                         (txt_node.data.chars().count() as u32) * 10,
+//                         24,
+//                     );
+//                     canvas.copy(&texture, None, Some(target))?;
+//                     canvas.present();
+//                 }
+
+//                 /*
+//                  * render nodep
+//                  */
+//                 NodeType::Element(_elem_node) => {
+//                     canvas.set_draw_color(background_color);
+//                     // FIXME: 1600. 24
+//                     let _ = canvas.fill_rect(Rect::new(pos.x as i32, pos.y as i32, 1600, 24));
+//                     canvas.present();
+
+//                     // TODO: control brother x, y
+//                     // pos.x += width;
+//                     // pos.y += height;
+
+//                     for child in layout.children.iter() {
+//                         let _ = paint_layout(canvas, ttf_context, child, pos);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     Ok(())
+// }
+
+// fn get_width(props: &PropertyMap) -> u32 {
+//     match props.get("width") {
+//         Some(v) => match v {
+//             CSSValue::Length(l) => match l.1 {
+//                 Unit::Px => l.0 as u32,
+//                 Unit::Rem => (l.0 * 16) as u32,
+//                 Unit::Percent => todo!("todo get parent width"),
+//             },
+//             // invalid w1idth value
+//             // set to default 128
+//             CSSValue::Keyword(_) => 128 as u32,
+//         },
+//         None => todo!("get_width: auto compute. at {:?}", &props),
+//     }
+// }
+
+// pub fn get_height(props: &PropertyMap) -> u32 {
+//     match props.get("height") {
+//         Some(v) => match v {
+//             CSSValue::Length(l) => match l.1 {
+//                 Unit::Px => l.0 as u32,
+//                 Unit::Rem => (l.0 * 16) as u32,
+//                 Unit::Percent => todo!("todo get parent width"),
+//             },
+//             // invalid w1idth value
+//             // set to default 24
+//             CSSValue::Keyword(_) => 24 as u32,
+//         },
+//         None => todo!("get_height: auto compute. at {:?}", &props),
+//     }
+// }
+
+// pub fn get_color(props: &PropertyMap) -> Color {
+//     match props.get("color") {
+//         Some(v) => match v {
+//             CSSValue::Keyword(k) => match &**k {
+//                 "red" => Color::RED,
+//                 "green" => Color::GREEN,
+//                 "blue" => Color::BLUE,
+//                 "black" => Color::BLACK,
+//                 "white" => Color::WHITE,
+//                 "yellow" => Color::YELLOW,
+//                 "cyan" => Color::CYAN,
+//                 "magenta" => Color::MAGENTA,
+//                 _ => {
+//                     todo!("rgb, rgba, hex")
+//                 }
+//             },
+//             // set to default
+//             CSSValue::Length(_) => Color::BLACK,
+//         },
+//         // set to default
+//         None => Color::BLACK,
+//     }
+// }
+
+// pub fn get_background_color(props: &PropertyMap) -> Color {
+//     match props.get("background-color") {
+//         Some(v) => match v {
+//             CSSValue::Keyword(k) => match &**k {
+//                 "red" => Color::RED,
+//                 "green" => Color::GREEN,
+//                 "blue" => Color::BLUE,
+//                 "black" => Color::BLACK,
+//                 "white" => Color::WHITE,
+//                 "yellow" => Color::YELLOW,
+//                 "cyan" => Color::CYAN,
+//                 "magenta" => Color::MAGENTA,
+//                 _ => {
+//                     todo!("rgb, rgba, hex")
+//                 }
+//             },
+//             // set to default
+//             CSSValue::Length(_) => Color::WHITE,
+//         },
+//         // set to default
+//         None => Color::WHITE,
+//     }
+// }
