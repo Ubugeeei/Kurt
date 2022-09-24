@@ -16,24 +16,49 @@ pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn build_gui(app: &gtk::Application) {
-    // create the main window
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title("gtk input")
-        .width_request(1600)
-        .height_request(1000)
+        .width_request(1280)
+        .height_request(720)
         .build();
 
-    let main_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    window.set_child(Some(&main_container));
+    /*
+     *
+     * html rendering area
+     *
+     */
+    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
 
+    /*
+     *
+     * base browser areas
+     *
+     */
+    let header_container = gtk::Box::new(gtk::Orientation::Vertical, 3);
     let header_search_bar = gtk::Entry::builder()
         .margin_top(10)
         .margin_start(10)
         .margin_end(20)
+        .height_request(10)
         .css_classes(vec!["input".to_string()])
         .build();
-    main_container.append(&header_search_bar);
+    header_container.append(&header_search_bar);
+    window.set_child(Some(&header_container));
+
+    let body_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    header_container.append(&body_container);
+
+    // header_container.append(&document_container);
+    let scrolled_window = gtk::ScrolledWindow::builder()
+        .hscrollbar_policy(gtk::PolicyType::Never) // Disable horizontal scrolling
+        .height_request(720)
+        .css_classes(vec!["scrolled-window".to_string()])
+        .child(&document_container)
+        .build();
+
+    header_container.append(&scrolled_window);
+
     window.present();
 
     /*
@@ -43,16 +68,22 @@ fn build_gui(app: &gtk::Application) {
      * fetch html from url and render it
      *
      */
-    header_search_bar.connect_activate(clone!(@strong main_container => move |header_search_bar| {
-        let url = header_search_bar.text().to_string();
-        let html = fetch_html(&url);
-        println!("---------------------------------------------------------");
-        println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
-        println!("---------------------------------------------------------");
-        println!("content");
-        println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
-        render_document(&html, &main_container);
-    }));
+    header_search_bar.connect_activate(
+        clone!(@strong scrolled_window  => move |header_search_bar| {
+            // reset document_container
+            let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+            scrolled_window.set_child(Some(&document_container));
+
+            let url = header_search_bar.text().to_string();
+            let html = fetch_html(&url);
+            println!("---------------------------------------------------------");
+            println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
+            println!("---------------------------------------------------------");
+            println!("content");
+            println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+            render_document(&html, &document_container);
+        }),
+    );
 }
 
 fn load_app_style() {
@@ -60,9 +91,13 @@ fn load_app_style() {
     let provider = gtk::CssProvider::new();
     provider.load_from_data(
         r#"
+            .scrolled-window {
+                background-color: #fff;
+            }
+
             .input {
                 border-radius: 50px;
-                padding-left: 10px;
+                padding-left: 24px;
                 padding-right: 10px;
                 outline: none;
                 font-size: 15px;
