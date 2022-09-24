@@ -58,14 +58,22 @@ fn build_gui(app: &gtk::Application) {
             &format!("{:?}", document)[..100]
         );
 
-        // TODO: parse css from html
+        println!("---------------------------------------------------------");
+        println!("[\x1b[32mJavaScript Execution\x1b[0m]");
+        println!("---------------------------------------------------------");
+        println!("log");
+        let mut javascript_runtime = JavaScriptRuntime::new();
+        let style_string = load(&mut javascript_runtime, &document);
+
         let default_stylesheets = std::fs::read_to_string("./assets/css/default.css").unwrap();
-        let cssom = parse_css(default_stylesheets).unwrap();
+        let style_string = format!("{}{}", default_stylesheets, style_string);
+        let cssom = parse_css(style_string).unwrap();
         println!("---------------------------------------------------------");
         println!("[\x1b[32mParse CSSOM: (default css)\x1b[0m]");
         println!("---------------------------------------------------------");
         println!("content");
         println!("\n\x1b[30m{}\n...\x1b[0m\n", &format!("{:?}", cssom)[..100]);
+
 
         let styled_document = create_styled_document(&document, &cssom);
         let layout_document = create_layout_document(styled_document);
@@ -78,12 +86,6 @@ fn build_gui(app: &gtk::Application) {
             &format!("{:?}", layout_document.top_box)[..100]
         );
 
-        println!("---------------------------------------------------------");
-        println!("[\x1b[32mJavaScript Execution\x1b[0m]");
-        println!("---------------------------------------------------------");
-        println!("log");
-        let mut javascript_runtime = JavaScriptRuntime::new();
-        execute_javascript(&mut javascript_runtime, &document);
 
         println!("---------------------------------------------------------");
         println!("[\x1b[32mPaint Content\x1b[0m]");
@@ -126,10 +128,13 @@ fn load_css() {
     );
 }
 
-fn execute_javascript(js_runtime: &mut JavaScriptRuntime, dom: &Document) {
-    println!("");
+type CSSString = String;
+/// load script and styles
+fn load(js_runtime: &mut JavaScriptRuntime, dom: &Document) -> CSSString {
+    let mut css = String::new();
+
     let root_element = &dom.document_element;
-    fn _execute_javascript(js_runtime: &mut JavaScriptRuntime, node: &Node) {
+    fn _load(js_runtime: &mut JavaScriptRuntime, node: &Node, css: &mut CSSString) -> CSSString {
         match node.node_type {
             NodeType::Element(ref element) => {
                 if element.tag_name == "script" {
@@ -143,15 +148,27 @@ fn execute_javascript(js_runtime: &mut JavaScriptRuntime, dom: &Document) {
                             _ => (),
                         }
                     }
+                } else if element.tag_name == "style" {
+                    for child in node.children.iter() {
+                        match child.node_type {
+                            NodeType::Text(ref text) => {
+                                css.push_str(&text.data);
+                            }
+                            _ => (),
+                        }
+                    }
                 } else {
                     for child in node.children.iter() {
-                        _execute_javascript(js_runtime, child);
+                        _load(js_runtime, child, css);
                     }
                 }
             }
             _ => (),
-        }
+        };
+        css.to_string()
     }
 
-    _execute_javascript(js_runtime, root_element);
+    _load(js_runtime, root_element, &mut css);
+
+    return css;
 }
