@@ -9,6 +9,10 @@
 
 use gtk::prelude::*;
 
+use crate::core::LayoutDocument;
+
+pub fn paint_document(layout: &LayoutDocument, parent_box: &gtk::ApplicationWindow) {}
+
 // pub fn paint_base(canvas: &mut Canvas<Window>) -> Result<(), Box<dyn std::error::Error>> {
 //     // background
 //     canvas.set_draw_color(Color::RGB(255, 255, 255));

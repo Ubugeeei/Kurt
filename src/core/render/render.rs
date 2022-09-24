@@ -5,6 +5,7 @@ use crate::core::html::parser::parse_html;
 use crate::core::{create_layout_document, create_styled_document, Document, Node, NodeType};
 
 use gtk::gio::ApplicationFlags;
+use gtk::glib::clone;
 use gtk::prelude::*;
 use gtk::Application;
 
@@ -27,18 +28,18 @@ fn build_gui(app: &gtk::Application) {
         .height_request(1000)
         .build();
 
-    let header_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    window.set_child(Some(&header_container));
+    let main_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    window.set_child(Some(&main_container));
 
     let header_search_bar = gtk::Entry::builder()
         .margin_top(10)
         .margin_start(10)
-        .margin_end(10)
+        .margin_end(20)
         .css_classes(vec!["input".to_string()])
         .build();
 
     // handle the input
-    header_search_bar.connect_activate(move |header_search_bar| {
+    header_search_bar.connect_activate(clone!(@strong main_container => move |header_search_bar| {
         let url = header_search_bar.text().to_string();
         let html = fetch_html(&url);
         println!("---------------------------------------------------------");
@@ -84,10 +85,15 @@ fn build_gui(app: &gtk::Application) {
         let mut javascript_runtime = JavaScriptRuntime::new();
         execute_javascript(&mut javascript_runtime, &document);
 
-        // TODO: build layout
-    });
+        // TODO: append layout document to window
+        let text = gtk::Label::builder()
+            .label(&url)
+            .css_classes(vec!["text".to_string()])
+            .build();
+        main_container.append(&text);
+    }));
 
-    header_container.append(&header_search_bar);
+    main_container.append(&header_search_bar);
     window.present();
 }
 
