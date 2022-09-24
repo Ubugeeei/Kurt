@@ -5,7 +5,7 @@ HTML parser, CSS parser, layout engine, renderer.
 
 ## Deps
 
-- paint: [GKT4](https://github.com/gtk-rs/gtk4-rs)
+- paint: [GTK](https://github.com/gtk-rs/gtk4-rs)
 - JavaScript Engine: [Glasper](https://github.com/Ubugeeei/Glasper) (my scratch implementation)
 ## Usage
 
