@@ -5,17 +5,14 @@ HTML parser, CSS parser, layout engine, renderer.
 
 ## Deps
 
-- paint: [sdl2](https://github.com/Rust-SDL2/rust-sdl2)
+- paint: [GKT4](https://github.com/gtk-rs/gtk4-rs)
 - JavaScript Engine: [Glasper](https://github.com/Ubugeeei/Glasper) (my scratch implementation)
-
 ## Usage
 
 1. install deps
 
    - rust, cargo
-   - sdl2 (ttf, image, gfx)  
-     https://github.com/Rust-SDL2/rust-sdl2#requirements  
-     macOS ex) `brew install sdl2_ttf sdl2_image sdl2_gfx`
+   - gtk4
 
 2. edit your html, css (./example)
 
@@ -26,4 +23,5 @@ HTML parser, CSS parser, layout engine, renderer.
 
 ---
 
-https://user-images.githubusercontent.com/71201308/184876622-2c15ba58-3e76-4104-8007-1ae178ec5a3e.mov
+https://user-images.githubusercontent.com/71201308/192097835-020f7111-02d2-4898-b2cc-1aeb346d6bb3.mov
+
