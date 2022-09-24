@@ -31,7 +31,7 @@ fn build_gui(app: &gtk::Application) {
     let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
     // default
     let text = gtk::Label::builder()
-        .label("Type \"http://localhost:3000/\" and enter to get HTML!")
+        .label("Type \"localhost:3000/\" and enter to get HTML!")
         .css_classes(vec!["body-default-message".to_string()])
         .build();
     document_container.append(&text);
