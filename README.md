@@ -28,9 +28,10 @@ HTML parser, CSS parser, layout engine, renderer.
       - localhost:3000
       - localhost:3000/scroll
       - localhost:3000/js  
+   
+https://user-images.githubusercontent.com/71201308/192105049-58ac6b20-a343-44fb-9f70-1535bf554fb3.mov
 
-   image:  
-      https://user-images.githubusercontent.com/71201308/192097835-020f7111-02d2-4898-b2cc-1aeb346d6bb3.mov
+
 
 5. exit
    ```sh
