@@ -483,6 +483,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2540771e65fc8cb83cd6e8a237f70c319bd5c29f78ed1084ba5d50eeac86f7f9"
 
 [[package]]
+name = "kurt"
+version = "0.1.0"
+dependencies = [
+ "combine",
+ "glasper",
+ "gtk4",
+ "thiserror",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -510,16 +520,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "minimum-browser"
-version = "0.1.0"
-dependencies = [
- "combine",
- "glasper",
- "gtk4",
- "thiserror",
 ]
 
 [[package]]
