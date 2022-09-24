@@ -18,3 +18,6 @@ pub use self::render::*;
 
 pub mod javascript;
 pub use self::javascript::*;
+
+pub mod http;
+pub use self::http::*;

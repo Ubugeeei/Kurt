@@ -1,12 +1,12 @@
+use crate::core::fetch::fetch_html;
 use crate::core::glasper::js::JavaScriptRuntime;
+use crate::core::html::parser::parse_html;
 // use crate::core::runtime::JavaScriptRuntime;
-use crate::core::{Document, LayoutBox, Node, NodeType};
+use crate::core::{Document, Node, NodeType};
 
 use gtk::gio::ApplicationFlags;
 use gtk::prelude::*;
 use gtk::Application;
-
-use super::paint::paint;
 
 // use sdl2::event::Event;
 // use sdl2::image::{self, InitFlag};
@@ -18,58 +18,93 @@ use super::paint::paint;
 // const HEADER_HEIGHT: u32 = 60;
 
 // TODO: render layout
-pub fn render(
-    layout: &LayoutBox,
-    document: &Document,
-    js_runtime: &mut JavaScriptRuntime,
-) -> Result<(), Box<dyn std::error::Error>> {
-    // execute javascript
-    execute_javascript(js_runtime, document);
-
+pub fn render() -> Result<(), Box<dyn std::error::Error>> {
     // painting
     let app = Application::new(Some("com.example.App"), ApplicationFlags::HANDLES_OPEN);
-    paint(&app);
-
-    // // sdl init
-    // let sdl_context = sdl2::init()?;
-    // let video_subsystem = sdl_context.video()?;
-    // let ttf_context = ttf::init().map_err(|e| e.to_string())?;
-    // let _image_context = image::init(InitFlag::PNG | InitFlag::JPG)?;
-
-    // // create window & canvas
-    // let window = video_subsystem
-    //     .window("panel-pop", 1600, 1000)
-    //     .position_centered()
-    //     .build()
-    //     .map_err(|e| e.to_string())?;
-    // let mut canvas = window
-    //     .into_canvas()
-    //     .software()
-    //     .build()
-    //     .map_err(|e| e.to_string())?;
-
-    // // painting
-    // let mut pos = PainterHeadPosition::new(0, HEADER_HEIGHT);
-    // let _ = paint_base(&mut canvas);
-    // let _ = paint_layout(&mut canvas, &ttf_context, layout, &mut pos);
-
-    // // event loop
-    // 'mainloop: loop {
-    //     for event in sdl_context.event_pump()?.poll_iter() {
-    //         match event {
-    //             // Quit if the window is closed
-    //             Event::Quit { .. }
-    //             | Event::KeyDown {
-    //                 keycode: Option::Some(Keycode::Escape),
-    //                 ..
-    //             } => break 'mainloop,
-
-    //             _ => {}
-    //         }
-    //     }
-    // }
-
+    app.connect_startup(|_| load_css());
+    app.connect_activate(build_gui);
+    app.run();
     Ok(())
+}
+
+fn build_gui(app: &gtk::Application) {
+    // create the main window
+    let window = gtk::ApplicationWindow::builder()
+        .application(app)
+        .title("gtk input")
+        .width_request(1600)
+        .height_request(1000)
+        .build();
+
+    let header_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    // header_container.set_css_classes(&vec!["header-container"]);
+    window.set_child(Some(&header_container));
+
+    let header_search_bar = gtk::Entry::builder()
+        .margin_top(10)
+        .margin_start(10)
+        .margin_end(10)
+        .css_classes(vec!["input".to_string()])
+        .build();
+
+    // handle the input
+    header_search_bar.connect_activate(move |header_search_bar| {
+        let url = header_search_bar.text().to_string();
+        let html = fetch_html(&url);
+        println!("---------------------------------------------------------");
+        println!("[Fetch HTML: (url: {})]", url);
+        println!("---------------------------------------------------------");
+        println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+        println!("---------------------------------------------------------");
+
+        let document = parse_html(&html).unwrap();
+        println!("---------------------------------------------------------");
+        println!("[Parse Document]");
+        println!("---------------------------------------------------------");
+        println!(
+            "\n\x1b[30m{}\n...\x1b[0m\n",
+            &format!("{:?}", document)[..100]
+        );
+        println!("---------------------------------------------------------");
+
+        println!("---------------------------------------------------------");
+        println!("[JavaScript Execution]");
+        println!("---------------------------------------------------------");
+        let mut javascript_runtime = JavaScriptRuntime::new();
+        execute_javascript(&mut javascript_runtime, &document);
+        println!("---------------------------------------------------------");
+
+        // TODO: build layout
+    });
+
+    header_container.append(&header_search_bar);
+
+    window.present();
+}
+
+fn load_css() {
+    // Load the CSS file and add it to the provider
+    let provider = gtk::CssProvider::new();
+    provider.load_from_data(
+        r#"
+            .input {
+                border-radius: 50px;
+                padding-left: 10px;
+                padding-right: 10px;
+                outline: none;
+                font-size: 15px;
+                color: #888;
+            }
+    "#
+        .as_bytes(),
+    );
+
+    // Add the provider to the default screen
+    gtk::StyleContext::add_provider_for_display(
+        &gtk::gdk::Display::default().expect("Could not connect to a display."),
+        &provider,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
 }
 
 fn execute_javascript(js_runtime: &mut JavaScriptRuntime, dom: &Document) {
