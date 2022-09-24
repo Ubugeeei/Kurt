@@ -9,6 +9,7 @@ use crate::core::{
 use gtk::prelude::*;
 
 pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
+    dbg!(&layout);
     match layout.box_type {
         // if display none,  no painting
         BoxType::NoneBox => return,
