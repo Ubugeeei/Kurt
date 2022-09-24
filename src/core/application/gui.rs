@@ -29,6 +29,12 @@ fn build_gui(app: &gtk::Application) {
      *
      */
     let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    // default
+    let text = gtk::Label::builder()
+        .label("Type \"http://localhost:3000/\" and enter to get HTML!")
+        .css_classes(vec!["body-default-message".to_string()])
+        .build();
+    document_container.append(&text);
 
     /*
      *
@@ -75,13 +81,23 @@ fn build_gui(app: &gtk::Application) {
             scrolled_window.set_child(Some(&document_container));
 
             let url = header_search_bar.text().to_string();
-            let html = fetch_html(&url);
-            println!("---------------------------------------------------------");
-            println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
-            println!("---------------------------------------------------------");
-            println!("content");
-            println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
-            render_document(&html, &document_container);
+
+            // TODO: fetch
+            if url == "http://localhost:3000" || url == "http://localhost:3000/" || url == "localhost:3000" || url == "localhost:3000/" {
+                let html = fetch_html(&url);
+                println!("---------------------------------------------------------");
+                println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
+                println!("---------------------------------------------------------");
+                println!("content");
+                println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+                render_document(&html, &document_container);
+            } else {
+                let text = gtk::Label::builder()
+                    .label("Pages not found.")
+                    .css_classes(vec!["body-default-message".to_string()])
+                    .build();
+                document_container.append(&text);
+            }
         }),
     );
 }
@@ -101,6 +117,12 @@ fn load_app_style() {
                 padding-right: 10px;
                 outline: none;
                 font-size: 15px;
+                color: #888;
+            }
+
+            .body-default-message {
+                margin-top: 20px;
+                font-size: 20px;
                 color: #888;
             }
 
