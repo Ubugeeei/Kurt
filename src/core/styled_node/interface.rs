@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::core::{CSSValue, NodeType};
+use crate::core::{cssom::CSSValue, dom::NodeType};
 
 #[derive(Debug)]
 pub struct StyledDocument<'a> {

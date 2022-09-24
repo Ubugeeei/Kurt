@@ -1,20 +1,9 @@
-pub mod parser;
-pub use self::parser::*;
-
-mod dom;
-pub use self::dom::*;
-
+pub mod application;
 mod cssom;
-pub use self::cssom::*;
-
-mod styled_node;
-pub use self::styled_node::*;
-
-mod layout;
-pub use self::layout::*;
-
-pub mod render;
-pub use self::render::*;
-
+mod dom;
+pub mod http;
 pub mod javascript;
-pub use self::javascript::*;
+mod layout;
+pub mod parser;
+pub mod render;
+mod styled_node;

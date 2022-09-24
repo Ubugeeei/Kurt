@@ -1,23 +1,55 @@
-<body>
-	<div id="main" class="content">
-		<div class="message">Hello, world!! My browser is working!</div>
-		<p class="hide">this is hide element</p>
-	</div>
+<html>
+  <body>
+    <div id="main" class="content">
+      <div class="message">Hello, world!! My browser is working!</div>
+      <p class="hide">this is hide element</p>
+    </div>
+  </body>
 
-	<script>
-		// Closure
-		let count = 6;
-		const double = function (n) {
-			return n * 2;
-		};
-		console.log("double(count):", double(count));
+  <script>
+    // Closure
+    let count = 6;
+    const double = function (n) {
+      return n * 2;
+    };
+    console.log("double(count):", double(count));
 
-		// Recursion
-		const factorial = function (num) {
-			if (num === 0) return 1;
-			return num * factorial(num - 1);
-		};
-		const res = factorial(5);
-		console.log("factorial(5):", res);
-	</script>
-</body>
+    // Recursion
+    const factorial = function (num) {
+      if (num === 0) return 1;
+      return num * factorial(num - 1);
+    };
+    const res = factorial(5);
+    console.log("factorial(5):", res);
+  </script>
+
+  <style>
+    body {
+      width: 1600px;
+      height: 1000px;
+    }
+    p {
+      width: 256px;
+      height: 24px;
+    }
+
+    .content {
+      width: 1200px;
+      height: 768px;
+    }
+    .message {
+      width: 1200px;
+      height: 100px;
+    }
+
+    .fwb {
+      font-weight: bold;
+    }
+    .red {
+      color: red;
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+</html>

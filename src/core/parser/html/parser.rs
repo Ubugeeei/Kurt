@@ -4,7 +4,7 @@ use super::{
     super::super::dom::{Element, Node, Text},
     tag::{close_tag, open_tag},
 };
-use crate::core::{AttrMap, Document};
+use crate::core::dom::{AttrMap, Document};
 
 #[allow(unused_imports)]
 use combine::{
@@ -99,9 +99,6 @@ parser! {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::core::AttrMap;
-
     use super::*;
 
     #[test]

@@ -1,17 +1,18 @@
-script, style {
-  display: none;
+script,
+style {
+	display: none;
 }
 body {
-  display: block;
-  margin: 8px;
+	display: block;
+	margin: 8px;
 }
 div {
-  display: block;
+	display: block;
 }
 p {
-  display: block;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  margin-left: 0px;
-  margin-right: 0px;
+	display: block;
+	margin-top: 16px;
+	margin-bottom: 16px;
+	margin-left: 0px;
+	margin-right: 0px;
 }

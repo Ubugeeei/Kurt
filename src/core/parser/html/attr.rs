@@ -1,4 +1,4 @@
-use crate::core::AttrMap;
+use crate::core::dom::AttrMap;
 use combine::{
     between,
     error::ParseError,

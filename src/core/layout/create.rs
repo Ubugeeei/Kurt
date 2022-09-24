@@ -1,5 +1,5 @@
 use super::{BoxProps, BoxType, LayoutBox, LayoutDocument};
-use crate::core::{Display, StyledDocument, StyledNode};
+use crate::core::styled_node::{Display, StyledDocument, StyledNode};
 
 pub fn create_layout_document(document: StyledDocument<'_>) -> LayoutDocument<'_> {
     let layout_box = create_layout_box(document.document_element);
