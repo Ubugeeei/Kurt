@@ -1,7 +1,7 @@
 type HTMLString = String;
 
 pub fn fetch_html(url: &str) -> HTMLString {
-    let req_url = if url.len() > 0 {
+    let req_url = if url.len() > 5 {
         if &url[0..4] == "http" {
             url.to_string()
         } else {
