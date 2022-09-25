@@ -1,3 +1,7 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use crate::core::history::Histories;
 use crate::core::http::fetch::fetch_html;
 use crate::core::render::render_document;
 
@@ -17,10 +21,12 @@ pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn build_gui(app: &gtk::Application) {
+    let histories = Rc::new(RefCell::new(Histories::new()));
+
     /*
-     * 
+     *
      * elements definition
-     * 
+     *
      */
     let window = gtk::ApplicationWindow::builder()
         .application(app)
@@ -32,7 +38,7 @@ fn build_gui(app: &gtk::Application) {
     let container = gtk::Box::new(gtk::Orientation::Vertical, 3);
     let header_container = gtk::Box::new(gtk::Orientation::Horizontal, 3);
     // refresh icon btn
-    let button = Button::builder()
+    let refresh_btn = Button::builder()
         // NOTE: http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
         .icon_name("view-refresh")
         .css_classes(vec!["refresh-icon".to_string()])
@@ -57,18 +63,18 @@ fn build_gui(app: &gtk::Application) {
         .child(&document_container)
         .build();
     // default document view
-    let text = gtk::Label::builder() 
+    let text = gtk::Label::builder()
         .label("Type \"localhost:3000/\" and enter to get HTML!")
         .css_classes(vec!["body-default-message".to_string()])
         .build();
 
     /*
-     * 
+     *
      * layout
-     * 
+     *
      */
     document_container.append(&text);
-    header_container.append(&button);
+    header_container.append(&refresh_btn);
     header_container.append(&header_search_bar);
     window.set_child(Some(&container));
     container.append(&header_container);
@@ -85,15 +91,16 @@ fn build_gui(app: &gtk::Application) {
      *
      */
     header_search_bar.connect_activate(
-        clone!(@strong scrolled_window, @strong button => move |header_search_bar| {
+        clone!(@strong histories, @strong scrolled_window, @strong refresh_btn => move |header_search_bar| {
             let url = header_search_bar.text().to_string();
-            refresh(&url, &scrolled_window, &button);
+            histories.borrow_mut().set(&url);
+            render_by_url(&url, &scrolled_window, &refresh_btn);
         }),
     );
-    button.connect_clicked(
-        clone!(@strong scrolled_window, @strong header_search_bar => move |button| {
+    refresh_btn.connect_clicked(
+        clone!(@strong scrolled_window, @strong header_search_bar => move |refresh_btn| {
             let url = header_search_bar.text().to_string();
-            refresh(&url, &scrolled_window, &button);
+            render_by_url(&url, &scrolled_window, &refresh_btn);
         }),
     );
 }
@@ -144,8 +151,8 @@ fn load_app_style() {
     );
 }
 
-pub fn refresh(url: &str, scrolled_window: &gtk::ScrolledWindow, _button: &gtk::Button) {
-    // button.set_icon_name("window-close");
+pub fn render_by_url(url: &str, scrolled_window: &gtk::ScrolledWindow, _refresh_btn: &gtk::Button) {
+    // refresh_btn.set_icon_name("window-close");
     // reset document_container
     let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
     scrolled_window.set_child(Some(&document_container));
@@ -160,5 +167,5 @@ pub fn refresh(url: &str, scrolled_window: &gtk::ScrolledWindow, _button: &gtk::
         println!("{}", html);
     }
     render_document(&html, &document_container);
-    // button.set_icon_name("view-refresh"); // FIXME: not working!
+    // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
 }
