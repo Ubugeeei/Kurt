@@ -112,6 +112,22 @@ fn build_gui(app: &gtk::Application) {
             render_by_url(&url, &scrolled_window, &refresh_btn);
         }),
     );
+    back_document_btn.connect_clicked(
+        clone!(@strong histories, @strong scrolled_window, @strong refresh_btn, @strong header_search_bar => move |_| {
+            if let Some(his) = histories.borrow_mut().back() {
+                header_search_bar.set_text(&his.url);
+                render_by_url(&his.url, &scrolled_window, &refresh_btn);
+            }
+        }),
+    );
+    forward_document_btn.connect_clicked(
+        clone!(@strong histories, @strong scrolled_window, @strong refresh_btn, @strong header_search_bar => move |_| {
+            if let Some(his) = histories.borrow_mut().forward() {
+                header_search_bar.set_text(&his.url);
+                render_by_url(&his.url, &scrolled_window, &refresh_btn);
+            }
+        }),
+    );
     refresh_btn.connect_clicked(
         clone!(@strong scrolled_window, @strong header_search_bar => move |refresh_btn| {
             let url = header_search_bar.text().to_string();
