@@ -1,7 +1,10 @@
 use crate::{
     javascript::glasper::js::JavaScriptRuntime,
     render::{
-        dom::{document::Document, node::{Node, NodeType}},
+        dom::{
+            document::Document,
+            node::{Node, NodeType},
+        },
         layout::create_layout_document,
         parser::{css::stylesheet::parse_css, html::parser::parse_html},
         styled_node::create_styled_document,

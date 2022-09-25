@@ -4,7 +4,7 @@ use super::{
     super::super::dom::{chardata::Text, element::Element, node::Node},
     tag::{close_tag, open_tag},
 };
-use crate::render::dom::{element::AttrMap, document::Document};
+use crate::render::dom::{document::Document, element::AttrMap};
 
 #[allow(unused_imports)]
 use combine::{
