@@ -5,6 +5,7 @@ use gtk::gio::ApplicationFlags;
 use gtk::glib::clone;
 use gtk::prelude::*;
 use gtk::Application;
+use gtk::Button;
 
 pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
     // painting
@@ -16,54 +17,63 @@ pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn build_gui(app: &gtk::Application) {
+    /*
+     * 
+     * elements definition
+     * 
+     */
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title("gtk input")
         .width_request(1280)
         .height_request(720)
         .build();
-
-    /*
-     *
-     * html rendering area
-     *
-     */
-    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    // default
-    let text = gtk::Label::builder()
-        .label("Type \"localhost:3000/\" and enter to get HTML!")
-        .css_classes(vec!["body-default-message".to_string()])
+    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6); // html rendering area
+    let container = gtk::Box::new(gtk::Orientation::Vertical, 3);
+    let header_container = gtk::Box::new(gtk::Orientation::Horizontal, 3);
+    // refresh icon btn
+    let button = Button::builder()
+        // NOTE: http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+        .icon_name("view-refresh")
+        .css_classes(vec!["refresh-icon".to_string()])
+        .margin_top(20)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
         .build();
-    document_container.append(&text);
-
-    /*
-     *
-     * base browser areas
-     *
-     */
-    let header_container = gtk::Box::new(gtk::Orientation::Vertical, 3);
     let header_search_bar = gtk::Entry::builder()
         .margin_top(10)
         .margin_start(10)
         .margin_end(20)
         .height_request(10)
+        .width_request(1280)
         .css_classes(vec!["input".to_string()])
         .build();
-    header_container.append(&header_search_bar);
-    window.set_child(Some(&header_container));
-
     let body_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    header_container.append(&body_container);
-
-    // header_container.append(&document_container);
     let scrolled_window = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Never) // Disable horizontal scrolling
         .height_request(720)
         .css_classes(vec!["scrolled-window".to_string()])
         .child(&document_container)
         .build();
+    // default document view
+    let text = gtk::Label::builder() 
+        .label("Type \"localhost:3000/\" and enter to get HTML!")
+        .css_classes(vec!["body-default-message".to_string()])
+        .build();
 
-    header_container.append(&scrolled_window);
+    /*
+     * 
+     * layout
+     * 
+     */
+    document_container.append(&text);
+    header_container.append(&button);
+    header_container.append(&header_search_bar);
+    window.set_child(Some(&container));
+    container.append(&header_container);
+    container.append(&body_container);
+    container.append(&scrolled_window);
 
     window.present();
 
@@ -75,23 +85,15 @@ fn build_gui(app: &gtk::Application) {
      *
      */
     header_search_bar.connect_activate(
-        clone!(@strong scrolled_window => move |header_search_bar| {
-            // reset document_container
-            let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-            scrolled_window.set_child(Some(&document_container));
-
+        clone!(@strong scrolled_window, @strong button => move |header_search_bar| {
             let url = header_search_bar.text().to_string();
-            let html = fetch_html(&url);
-            println!("---------------------------------------------------------");
-            println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
-            println!("---------------------------------------------------------");
-            println!("content");
-            if html.len() > 100 {
-                println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
-            } else {
-                println!("{}", html);
-            }
-            render_document(&html, &document_container);
+            refresh(&url, &scrolled_window, &button);
+        }),
+    );
+    button.connect_clicked(
+        clone!(@strong scrolled_window, @strong header_search_bar => move |button| {
+            let url = header_search_bar.text().to_string();
+            refresh(&url, &scrolled_window, &button);
         }),
     );
 }
@@ -101,8 +103,10 @@ fn load_app_style() {
     let provider = gtk::CssProvider::new();
     provider.load_from_data(
         r#"
-            .scrolled-window {
-                background-color: #fff;
+            .refresh-icon {
+                border: none;
+                box-shadow: none;
+                border-radius: 50%;
             }
 
             .input {
@@ -112,6 +116,10 @@ fn load_app_style() {
                 outline: none;
                 font-size: 15px;
                 color: #888;
+            }
+
+            .scrolled-window {
+                background-color: #fff;
             }
 
             .body-default-message {
@@ -134,4 +142,23 @@ fn load_app_style() {
         &provider,
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
+}
+
+pub fn refresh(url: &str, scrolled_window: &gtk::ScrolledWindow, _button: &gtk::Button) {
+    // button.set_icon_name("window-close");
+    // reset document_container
+    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    scrolled_window.set_child(Some(&document_container));
+    let html = fetch_html(&url);
+    println!("---------------------------------------------------------");
+    println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
+    println!("---------------------------------------------------------");
+    println!("content");
+    if html.len() > 100 {
+        println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+    } else {
+        println!("{}", html);
+    }
+    render_document(&html, &document_container);
+    // button.set_icon_name("view-refresh"); // FIXME: not working!
 }
