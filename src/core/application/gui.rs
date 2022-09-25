@@ -76,9 +76,13 @@ fn build_gui(app: &gtk::Application) {
         .css_classes(vec!["scrolled-window".to_string()])
         .child(&document_container)
         .build();
+    let default_title = gtk::Label::builder()
+        .label("Hello, Kurt Browser!")
+        .css_classes(vec!["default-title".to_string()])
+        .build();
     let default_text = gtk::Label::builder()
-        .label("Type \"localhost:3000/\" and enter to get HTML!")
-        .css_classes(vec!["body-default-message".to_string()])
+        .label("Type \"localhost:3000\" and enter to get HTML!")
+        .css_classes(vec!["default-text".to_string()])
         .build();
 
     /*
@@ -86,6 +90,7 @@ fn build_gui(app: &gtk::Application) {
      * layout
      *
      */
+    document_container.append(&default_title);
     document_container.append(&default_text);
     header_container.append(&back_document_btn);
     header_container.append(&forward_document_btn);
@@ -160,7 +165,13 @@ fn load_app_style() {
                 background-color: #fff;
             }
 
-            .body-default-message {
+            .default-title {
+                margin-top: 300px;
+                font-size: 30px;
+                color: #888;
+            }
+
+            .default-text {
                 margin-top: 20px;
                 font-size: 20px;
                 color: #888;
@@ -168,7 +179,7 @@ fn load_app_style() {
 
             .kurt-text-default {
                 font-size: 15px;
-                color: #222;
+                color: #555;
             }
     "#
         .as_bytes(),
@@ -183,20 +194,34 @@ fn load_app_style() {
 }
 
 pub fn render_by_url(url: &str, scrolled_window: &gtk::ScrolledWindow, _refresh_btn: &gtk::Button) {
-    // refresh_btn.set_icon_name("window-close");
     // reset document_container
     let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
     scrolled_window.set_child(Some(&document_container));
-    let html = fetch_html(&url);
-    println!("---------------------------------------------------------");
-    println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
-    println!("---------------------------------------------------------");
-    println!("content");
-    if html.len() > 100 {
-        println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+
+    if url.is_empty() {
+        let default_title = gtk::Label::builder()
+            .label("Hello, Kurt Browser!")
+            .css_classes(vec!["default-title".to_string()])
+            .build();
+        let default_text = gtk::Label::builder()
+            .label("Type \"localhost:3000\" and enter to get HTML!")
+            .css_classes(vec!["default-text".to_string()])
+            .build();
+        document_container.append(&default_title);
+        document_container.append(&default_text);
     } else {
-        println!("{}", html);
+        // refresh_btn.set_icon_name("window-close");
+        let html = fetch_html(&url);
+        println!("---------------------------------------------------------");
+        println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
+        println!("---------------------------------------------------------");
+        println!("content");
+        if html.len() > 100 {
+            println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+        } else {
+            println!("{}", html);
+        }
+        render_document(&html, &document_container);
+        // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
     }
-    render_document(&html, &document_container);
-    // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
 }
