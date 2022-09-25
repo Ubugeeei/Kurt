@@ -92,7 +92,6 @@ fn build_gui(app: &gtk::Application) {
     );
     button.connect_clicked(
         clone!(@strong scrolled_window, @strong header_search_bar => move |button| {
-            // FIXME: not working!
             let url = header_search_bar.text().to_string();
             refresh(&url, &scrolled_window, &button);
         }),
