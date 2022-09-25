@@ -3,6 +3,8 @@
 A toy web browser in Rust. (minimal childish implementation)  
 HTML parser, CSS parser, layout engine, renderer.
 
+![スクリーンショット 2022-09-25 13 46 18](https://user-images.githubusercontent.com/71201308/192128809-f01c77ff-7f4e-41c0-8010-6e4058a7627d.png)
+
 ## Deps
 
 - paint: [GTK](https://github.com/gtk-rs/gtk4-rs)
