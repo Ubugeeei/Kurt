@@ -62,8 +62,7 @@ fn build_gui(app: &gtk::Application) {
         .css_classes(vec!["scrolled-window".to_string()])
         .child(&document_container)
         .build();
-    // default document view
-    let text = gtk::Label::builder()
+    let default_text = gtk::Label::builder()
         .label("Type \"localhost:3000/\" and enter to get HTML!")
         .css_classes(vec!["body-default-message".to_string()])
         .build();
@@ -73,7 +72,7 @@ fn build_gui(app: &gtk::Application) {
      * layout
      *
      */
-    document_container.append(&text);
+    document_container.append(&default_text);
     header_container.append(&refresh_btn);
     header_container.append(&header_search_bar);
     window.set_child(Some(&container));
