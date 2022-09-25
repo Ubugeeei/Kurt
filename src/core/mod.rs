@@ -1,6 +1,7 @@
 pub mod application;
 mod cssom;
 mod dom;
+mod history;
 pub mod http;
 pub mod javascript;
 mod layout;
