@@ -2,45 +2,47 @@ name: Rust
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: macOS-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: install_dependencies
-      run: |
-        brew install rustup
-        rustup-init -y --default-toolchain stable 
-        brew install gtk4
-        pkg-config --modversion gtk4
+      - name: install_dependencies
+        run: |
+          brew install rustup
+          rustup-init -y --default-toolchain stable 
+          brew install gtk4
+          pkg-config --modversion gtk4
 
-    - name: Check Format
-      run: |
-        export PATH="$HOME/.cargo/bin:$PATH"
-        rustup component add rustfmt --toolchain 1.64.0-x86_64-apple-darwin && cargo fmt --check
+      - name: Check Tools
+        run: rustup show
 
-    - name: Lint
-      run: |
-        export PATH="$HOME/.cargo/bin:$PATH"
-        rustup component add clippy --toolchain 1.64.0-x86_64-apple-darwin && cargo clippy --all-targets --all-features --
+      - name: Check Format
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup component add rustfmt --toolchain 1.64.0-x86_64-apple-darwin && cargo fmt --check
 
-    - name: Build
-      run: |
-        export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
-        export PATH="$HOME/.cargo/bin:$PATH"
-        cargo build --release
+      - name: Lint
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup component add clippy --toolchain 1.64.0-x86_64-apple-darwin && cargo clippy --all-targets --all-features --
 
-    - name: Run tests
-      run: |
-        export PATH="$HOME/.cargo/bin:$PATH"
-        cargo test
+      - name: Build
+        run: |
+          export LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo build --release
+
+      - name: Run tests
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo test
