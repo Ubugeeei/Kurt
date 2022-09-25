@@ -1,5 +1,9 @@
-mod core;
+mod application;
+mod history;
+mod http;
+mod javascript;
+mod render;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    core::application::gui::start_app()
+    application::start_app()
 }
