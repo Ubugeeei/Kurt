@@ -31,34 +31,48 @@ fn build_gui(app: &gtk::Application) {
     let window = gtk::ApplicationWindow::builder()
         .application(app)
         .title("gtk input")
-        .width_request(1280)
-        .height_request(720)
+        .width_request(1400)
+        .height_request(800)
         .build();
     let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6); // html rendering area
     let container = gtk::Box::new(gtk::Orientation::Vertical, 3);
     let header_container = gtk::Box::new(gtk::Orientation::Horizontal, 3);
-    // refresh icon btn
+    let back_document_btn = Button::builder()
+        // NOTE: http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+        .icon_name("go-previous")
+        .css_classes(vec!["header-nav-btn".to_string()])
+        .margin_top(20)
+        .margin_bottom(12)
+        .margin_start(5)
+        .build();
+    let forward_document_btn = Button::builder()
+        // NOTE: http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+        .icon_name("go-next")
+        .css_classes(vec!["header-nav-btn".to_string()])
+        .margin_top(20)
+        .margin_bottom(12)
+        .margin_start(5)
+        .build();
     let refresh_btn = Button::builder()
         // NOTE: http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
         .icon_name("view-refresh")
-        .css_classes(vec!["refresh-icon".to_string()])
+        .css_classes(vec!["header-nav-btn".to_string()])
         .margin_top(20)
         .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
+        .margin_end(5)
         .build();
     let header_search_bar = gtk::Entry::builder()
         .margin_top(10)
         .margin_start(10)
         .margin_end(20)
         .height_request(10)
-        .width_request(1280)
+        .width_request(1400)
         .css_classes(vec!["input".to_string()])
         .build();
     let body_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
     let scrolled_window = gtk::ScrolledWindow::builder()
         .hscrollbar_policy(gtk::PolicyType::Never) // Disable horizontal scrolling
-        .height_request(720)
+        .height_request(800)
         .css_classes(vec!["scrolled-window".to_string()])
         .child(&document_container)
         .build();
@@ -73,6 +87,8 @@ fn build_gui(app: &gtk::Application) {
      *
      */
     document_container.append(&default_text);
+    header_container.append(&back_document_btn);
+    header_container.append(&forward_document_btn);
     header_container.append(&refresh_btn);
     header_container.append(&header_search_bar);
     window.set_child(Some(&container));
@@ -109,7 +125,7 @@ fn load_app_style() {
     let provider = gtk::CssProvider::new();
     provider.load_from_data(
         r#"
-            .refresh-icon {
+            .header-nav-btn {
                 border: none;
                 box-shadow: none;
                 border-radius: 50%;

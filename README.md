@@ -14,6 +14,7 @@ HTML parser, CSS parser, layout engine, renderer.
 
    - rust, cargo
    - gtk4
+   - gnome-icon-theme
 
 2. edit your html, css (./example)
 
