@@ -1,4 +1,7 @@
+use gtk::traits::BoxExt;
+
 use crate::{
+    http::fetch::fetch_html,
     javascript::glasper::js::JavaScriptRuntime,
     render::{
         dom::{
@@ -10,6 +13,38 @@ use crate::{
         styled_node::create_styled_document,
     },
 };
+pub fn render_by_url(url: &str, scrolled_window: &gtk::ScrolledWindow, _refresh_btn: &gtk::Button) {
+    // reset document_container
+    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
+    scrolled_window.set_child(Some(&document_container));
+
+    if url.is_empty() {
+        let default_title = gtk::Label::builder()
+            .label("Hello, Kurt Browser!")
+            .css_classes(vec!["default-title".to_string()])
+            .build();
+        let default_text = gtk::Label::builder()
+            .label("Type \"localhost:3000\" and enter to get HTML!")
+            .css_classes(vec!["default-text".to_string()])
+            .build();
+        document_container.append(&default_title);
+        document_container.append(&default_text);
+    } else {
+        // refresh_btn.set_icon_name("window-close");
+        let html = fetch_html(&url);
+        println!("---------------------------------------------------------");
+        println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
+        println!("---------------------------------------------------------");
+        println!("content");
+        if html.len() > 100 {
+            println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
+        } else {
+            println!("{}", html);
+        }
+        render_document(&html, &document_container);
+        // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
+    }
+}
 
 pub fn render_document(html: &str, main_container: &gtk::Box) {
     let document = parse_html(&html).unwrap();

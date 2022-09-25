@@ -1,17 +1,17 @@
-use crate::{history::Histories, http::fetch::fetch_html, render::renderer::render_document};
+use crate::{history::Histories, render::renderer::render_by_url};
 use gtk::{gio::ApplicationFlags, glib::clone, prelude::*, Application, Button};
 use std::{cell::RefCell, rc::Rc};
 
-pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
+pub fn start() -> Result<(), Box<dyn std::error::Error>> {
     // painting
     let app = Application::new(Some("Kurt.browser.App"), ApplicationFlags::HANDLES_OPEN);
     app.connect_startup(|_| load_app_style());
-    app.connect_activate(build_gui);
+    app.connect_activate(build);
     app.run();
     Ok(())
 }
 
-fn build_gui(app: &gtk::Application) {
+fn build(app: &gtk::Application) {
     let histories = Rc::new(RefCell::new(Histories::new()));
 
     /*
@@ -182,37 +182,4 @@ fn load_app_style() {
         &provider,
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
-}
-
-pub fn render_by_url(url: &str, scrolled_window: &gtk::ScrolledWindow, _refresh_btn: &gtk::Button) {
-    // reset document_container
-    let document_container = gtk::Box::new(gtk::Orientation::Vertical, 6);
-    scrolled_window.set_child(Some(&document_container));
-
-    if url.is_empty() {
-        let default_title = gtk::Label::builder()
-            .label("Hello, Kurt Browser!")
-            .css_classes(vec!["default-title".to_string()])
-            .build();
-        let default_text = gtk::Label::builder()
-            .label("Type \"localhost:3000\" and enter to get HTML!")
-            .css_classes(vec!["default-text".to_string()])
-            .build();
-        document_container.append(&default_title);
-        document_container.append(&default_text);
-    } else {
-        // refresh_btn.set_icon_name("window-close");
-        let html = fetch_html(&url);
-        println!("---------------------------------------------------------");
-        println!("[\x1b[32mFetch HTML: (url: {})\x1b[0m]", url);
-        println!("---------------------------------------------------------");
-        println!("content");
-        if html.len() > 100 {
-            println!("\n\x1b[30m{}\n...\x1b[0m\n", &html[..100]);
-        } else {
-            println!("{}", html);
-        }
-        render_document(&html, &document_container);
-        // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
-    }
 }
