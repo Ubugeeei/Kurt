@@ -13,7 +13,7 @@ use gtk::Button;
 
 pub fn start_app() -> Result<(), Box<dyn std::error::Error>> {
     // painting
-    let app = Application::new(Some("com.example.App"), ApplicationFlags::HANDLES_OPEN);
+    let app = Application::new(Some("Kurt.browser.App"), ApplicationFlags::HANDLES_OPEN);
     app.connect_startup(|_| load_app_style());
     app.connect_activate(build_gui);
     app.run();
@@ -30,7 +30,7 @@ fn build_gui(app: &gtk::Application) {
      */
     let window = gtk::ApplicationWindow::builder()
         .application(app)
-        .title("gtk input")
+        .title("Kurt Browser")
         .width_request(1400)
         .height_request(800)
         .build();
