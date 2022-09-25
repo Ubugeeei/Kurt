@@ -27,7 +27,6 @@ impl Histories {
         }
         self.stack.push(History::new(url.to_string()));
         self.cursor = self.stack.len() as isize - 1;
-        dbg!(&self.stack);
     }
 
     pub fn forward(&mut self) -> Option<&History> {
