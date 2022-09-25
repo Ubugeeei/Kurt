@@ -34,6 +34,7 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
                         let text = gtk::Text::builder()
                             .text(txt_node.data.as_str())
                             .css_classes(vec!["kurt-text-default".to_string()])
+                            .editable(false)
                             .build();
                         main_container.append(&text);
                     }
@@ -78,6 +79,7 @@ pub fn paint_document(layout: &LayoutBox, main_container: &gtk::Box) {
                         let text = gtk::Text::builder()
                             .text(txt_node.data.as_str())
                             .css_classes(vec!["kurt-text-default".to_string()])
+                            .editable(false)
                             .build();
                         main_container.append(&text);
                     }
