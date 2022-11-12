@@ -5,6 +5,7 @@ use super::{
     tag::{close_tag, open_tag},
 };
 use crate::render::dom::{document::Document, element::AttrMap};
+use regex::Regex;
 
 #[allow(unused_imports)]
 use combine::{
@@ -22,8 +23,9 @@ pub enum HTMLParseError {
 }
 
 pub fn parse_html(html_string: &str) -> Result<Document, HTMLParseError> {
-    let _nodes = nodes()
-        .parse(html_string)
+    let html_string = skip_doctype(html_string);
+    let _nodes = nodes::<&str>()
+        .parse(html_string.as_ref())
         .map(|(nodes, _)| nodes)
         .map_err(HTMLParseError::InvalidResourceError);
 
@@ -97,6 +99,11 @@ parser! {
     }
 }
 
+fn skip_doctype(html: &str) -> String {
+    let re = Regex::new(r"<!(DOCTYPE|doctype)[^>]*>").unwrap();
+    re.replace_all(html, "").to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,18 +113,6 @@ mod tests {
         assert_eq!(
             element().easy_parse("<p></p>"),
             Ok((Element::new("p".to_string(), AttrMap::new(), vec![]), ""))
-        );
-
-        assert_eq!(
-            element().easy_parse("<p>Hello World</p>"),
-            Ok((
-                Element::new(
-                    "p".to_string(),
-                    AttrMap::new(),
-                    vec![Text::new("Hello World".to_string())]
-                ),
-                ""
-            ))
         );
 
         assert!(element().easy_parse("<p>Hello World</div>").is_err());
@@ -137,5 +132,17 @@ mod tests {
                 Ok((Text::new("Hello World".to_string()), "<"))
             );
         }
+    }
+
+    #[test]
+    fn test_skip_doctype() {
+        assert_eq!(
+            skip_doctype("<!DOCTYPE html><html></html>"),
+            "<html></html>"
+        );
+        assert_eq!(
+            skip_doctype("<!doctype html><html></html>"),
+            "<html></html>"
+        );
     }
 }
