@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use crate::render::dom::{chardata::Text, element::Element, node::Node};
+
 mod lex;
 mod token;
 
@@ -5,11 +9,12 @@ pub struct Parser {
     lexer: lex::Lexer,
     tokens: Vec<token::HTMLToken>,
     position: usize,
+    current_token: token::HTMLToken,
     read_position: usize,
 }
 
 impl Parser {
-    fn new(input: String) -> Parser {
+    pub fn new(input: String) -> Parser {
         let mut lexer = lex::Lexer::new(input);
         let tokens = lexer.lex();
         Parser {
@@ -17,13 +22,68 @@ impl Parser {
             tokens,
             position: 0,
             read_position: 0,
+            current_token: token::HTMLToken::EOF,
         }
     }
 
-    fn next(&mut self) -> token::HTMLToken {
-        let token = self.tokens[self.position].clone();
+    pub fn parse(&mut self) -> Vec<Box<Node>> {
+        let mut nodes = Vec::new();
+
+        while self.peek_non_white_token() != token::HTMLToken::EOF {
+            nodes.push(self.parse_node());
+        }
+
+        nodes
+    }
+
+    fn parse_node(&mut self) -> Box<Node> {
+        let token = self.peek_non_white_token();
+        match token {
+            token::HTMLToken::Lt => {
+                self.next_non_white_token(); // skip '<'
+                self.next_non_white_token();
+
+                let token = self.peek_non_white_token();
+                match token {
+                    token::HTMLToken::Word(tag_name) => self.parse_element(tag_name),
+                    _ => panic!(),
+                }
+            }
+            token::HTMLToken::Word(_) => self.parse_text(),
+            _ => panic!(),
+        }
+    }
+
+    fn parse_element(&mut self, tag_name: String) -> Box<Node> {
+        let mut attributes = HashMap::new();
+        let mut children = Vec::new();
+
+        // TODO:
+        Element::new(tag_name, attributes, children)
+    }
+
+    fn parse_text(&mut self) -> Box<Node> {
+        let mut text = String::new();
+
+        // TODO:
+        Text::new(text)
+    }
+
+    fn next(&mut self) {
+        self.current_token = self.tokens[self.position].clone();
         self.position += 1;
-        token
+    }
+
+    fn next_non_white_token(&mut self) {
+        loop {
+            self.next();
+            if self.current_token != token::HTMLToken::Space
+                && self.current_token != token::HTMLToken::Tab
+                && self.current_token != token::HTMLToken::Newline
+            {
+                break;
+            }
+        }
     }
 
     fn peek(&self, idx: usize) -> token::HTMLToken {
@@ -47,19 +107,56 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use crate::render::parse::html::token::HTMLToken;
-
     use super::*;
+    use crate::render::dom::{chardata::Text, element::Element};
+    use std::collections::HashMap;
 
     #[test]
-    fn test_next() {
-        let input = String::from("<!DOCTYPE html>");
+    fn test_parse() {
+        let input = String::from(
+            r#"<html>
+  <body>
+    <p class="my-class my-class2">Hello, world!</p>
+    <p class="my-class2">Hello, world!</p>
+  </body>
+</html>
+        "#,
+        );
         let mut parser = Parser::new(input);
-        assert_eq!(parser.next(), HTMLToken::Lt);
-        assert_eq!(parser.next(), HTMLToken::Exclamation);
-        assert_eq!(parser.next(), HTMLToken::Word(String::from("DOCTYPE")));
-        assert_eq!(parser.next(), HTMLToken::Space);
-        assert_eq!(parser.next(), HTMLToken::Word(String::from("html")));
-        assert_eq!(parser.next(), HTMLToken::Gt);
+        let nodes = parser.parse();
+        assert_eq!(
+            nodes,
+            vec![Element::new(
+                String::from("html"),
+                HashMap::new(),
+                vec![Element::new(
+                    String::from("body"),
+                    HashMap::new(),
+                    vec![
+                        Element::new(
+                            String::from("p"),
+                            {
+                                let mut attr = HashMap::new();
+                                attr.insert(
+                                    String::from("class"),
+                                    String::from("my-class my-class2"),
+                                );
+                                attr
+                            },
+                            vec![Text::new(String::from("Hello, world!"))]
+                        ),
+                        Element::new(
+                            String::from("p"),
+                            {
+                                let mut attr = HashMap::new();
+                                attr.insert(String::from("class"), String::from("my-class2"));
+                                attr
+                            },
+                            vec![Text::new(String::from("Hello, world!"))],
+                        )
+                    ]
+                )]
+            )]
+        );
     }
 }
