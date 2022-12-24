@@ -1,4 +1,8 @@
-use crate::render::dom::element::AttrMap;
+use crate::render::dom::{
+    chardata::Text,
+    element::{AttrMap, Element},
+    node::Node,
+};
 
 pub struct HTMLParser {
     input: String,
@@ -25,6 +29,38 @@ impl HTMLParser {
         } else {
             self.current_char = self.chars[self.position];
         }
+    }
+}
+
+/// parse node
+impl HTMLParser {
+    fn parse_nodes(&mut self) -> Vec<Box<Node>> {
+        let mut nodes = Vec::new();
+        while self.current_char != '\0' {
+            match self.current_char {
+                '<' => match self.peek_char() {
+                    '/' => {
+                        let _tag_name = self.parse_identifier();
+                        return nodes;
+                    }
+                    '!' => {
+                        let _ = self.parse_doc_type(); // NOTE: skip doc type
+                        return nodes;
+                    }
+                    _ => {
+                        let (tag_name, attributes) = self.parse_start_tag();
+                        let children = self.parse_nodes();
+                        let element = Element::new(tag_name, attributes, children);
+                        nodes.push(element);
+                    }
+                },
+                _ => {
+                    let text = self.parse_text();
+                    nodes.push(Text::new(text));
+                }
+            }
+        }
+        nodes
     }
 }
 
@@ -86,6 +122,18 @@ impl HTMLParser {
     }
 }
 
+/// parse text
+impl HTMLParser {
+    fn parse_text(&mut self) -> String {
+        let mut result = String::new();
+        while self.current_char != '<' && self.current_char != '\0' {
+            result.push(self.current_char);
+            self.next_char();
+        }
+        result
+    }
+}
+
 /// parser utils
 impl HTMLParser {
     fn parse_identifier(&mut self) -> String {
@@ -119,6 +167,14 @@ impl HTMLParser {
     fn consume_whitespace(&mut self) {
         while self.current_char.is_whitespace() {
             self.next_char();
+        }
+    }
+
+    fn peek_char(&self) -> char {
+        if self.position > self.input.len() - 1 {
+            '\0'
+        } else {
+            self.chars[self.position + 1]
         }
     }
 }
