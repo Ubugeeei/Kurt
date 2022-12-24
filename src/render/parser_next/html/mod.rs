@@ -1,5 +1,6 @@
 use crate::render::dom::{
     chardata::Text,
+    document::Document,
     element::{AttrMap, Element},
     node::Node,
 };
@@ -32,8 +33,14 @@ impl HTMLParser {
     }
 }
 
-/// parse node
+// TODO: error handling
 impl HTMLParser {
+    pub fn parse(&mut self, url: String) -> Document {
+        let nodes = self.parse_nodes();
+        let document_element = Element::new("html".to_string(), AttrMap::new(), nodes);
+        Document::new(url.clone(), url, document_element)
+    }
+
     fn parse_nodes(&mut self) -> Vec<Box<Node>> {
         let mut nodes = Vec::new();
         while self.current_char != '\0' {
