@@ -40,7 +40,7 @@ impl HTMLParser {
             match self.current_char {
                 '<' => match self.peek_char() {
                     '/' => {
-                        let _tag_name = self.parse_identifier();
+                        let _tag_name = self.parse_end_tag();
                         break;
                     }
                     '!' => {
@@ -301,7 +301,7 @@ mod test {
                         children: vec![
                             Box::new(Node {
                                 node_type: NodeType::Text(Text {
-                                    data: String::from("  \n")
+                                    data: String::from("\n  ")
                                 }),
                                 children: vec![]
                             }),
