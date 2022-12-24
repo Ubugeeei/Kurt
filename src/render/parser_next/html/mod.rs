@@ -18,9 +18,9 @@ impl HTMLParser {
 
     fn parse_attribute(&mut self) -> (String, String) {
         let name = self.parse_identifier();
-        // self.consume_whitespace();
+        self.consume_whitespace();
         self.consume_char('=');
-        // self.consume_whitespace();
+        self.consume_whitespace();
         let value = self.parse_string();
         (name, value)
     }
@@ -50,6 +50,12 @@ impl HTMLParser {
             self.next_char();
         } else {
             panic!("Expected char: {}, got: {}", c, self.current_char);
+        }
+    }
+
+    fn consume_whitespace(&mut self) {
+        while self.current_char.is_whitespace() {
+            self.next_char();
         }
     }
 
