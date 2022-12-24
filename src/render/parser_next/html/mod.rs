@@ -18,6 +18,18 @@ impl HTMLParser {
         }
     }
 
+    fn next_char(&mut self) {
+        self.position += 1;
+        if self.position > self.input.len() - 1 {
+            self.current_char = '\0';
+        } else {
+            self.current_char = self.chars[self.position];
+        }
+    }
+}
+
+/// parse tag
+impl HTMLParser {
     fn parse_start_tag(&mut self) -> (String, AttrMap) {
         self.consume_char('<');
         let tag_name = self.parse_identifier();
@@ -34,7 +46,10 @@ impl HTMLParser {
         self.consume_char('>');
         tag_name
     }
+}
 
+/// parse attributes
+impl HTMLParser {
     fn parse_attributes(&mut self) -> AttrMap {
         let mut attributes = AttrMap::new();
         while self.current_char != '>' {
@@ -53,7 +68,10 @@ impl HTMLParser {
         let value = self.parse_string();
         (name, value)
     }
+}
 
+/// parser utils
+impl HTMLParser {
     fn parse_identifier(&mut self) -> String {
         let mut result = String::new();
         while self.current_char.is_alphanumeric() {
@@ -87,15 +105,6 @@ impl HTMLParser {
             self.next_char();
         }
     }
-
-    fn next_char(&mut self) {
-        self.position += 1;
-        if self.position > self.input.len() - 1 {
-            self.current_char = '\0';
-        } else {
-            self.current_char = self.chars[self.position];
-        }
-    }
 }
 
 #[cfg(test)]
@@ -105,7 +114,7 @@ mod test {
     #[test]
     fn test_parse_start_tag() {
         assert_eq!(
-            HTMLParser::new("< id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
+            HTMLParser::new("<div id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
                 .parse_start_tag(),
             (String::from("div"), {
                 let mut attributes = AttrMap::new();
