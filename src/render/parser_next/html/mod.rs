@@ -70,14 +70,25 @@ mod test {
     #[test]
     fn test_parse_attribute() {
         assert_eq!(
+            HTMLParser::new("id=\"main\"".to_string()).parse_attribute(),
             (String::from("id"), String::from("main")),
-            HTMLParser::new("id=\"main\"".to_string()).parse_attribute()
         );
 
         // many values
         assert_eq!(
+            HTMLParser::new("class=\"mt-1 pa-2 text-input\"".to_string()).parse_attribute(),
             (String::from("class"), String::from("mt-1 pa-2 text-input")),
-            HTMLParser::new("class=\"mt-1 pa-2 text-input\"".to_string()).parse_attribute()
+        );
+
+        // includes whitespace
+        assert_eq!(
+            HTMLParser::new(
+                r#"class =
+"mt-1""#
+                    .to_string()
+            )
+            .parse_attribute(),
+            (String::from("class"), String::from("mt-1")),
         );
     }
 }
