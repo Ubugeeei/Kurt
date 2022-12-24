@@ -20,10 +20,11 @@ impl HTMLParser {
 
     fn parse_attributes(&mut self) -> AttrMap {
         let mut attributes = AttrMap::new();
+        self.consume_whitespace();
         while self.current_char != '>' {
-            self.consume_whitespace();
             let (name, value) = self.parse_attribute();
             attributes.insert(name, value);
+            self.consume_whitespace();
         }
         attributes
     }
@@ -90,6 +91,23 @@ mod test {
         assert_eq!(
             HTMLParser::new("id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
                 .parse_attributes(),
+            {
+                let mut attributes = AttrMap::new();
+                attributes.insert(String::from("id"), String::from("main"));
+                attributes.insert(String::from("class"), String::from("mt-1 pa-2 text-input"));
+                attributes
+            },
+        );
+
+        // includes whitespace
+        assert_eq!(
+            HTMLParser::new(
+                r#"id="main"
+class="mt-1 pa-2 text-input"
+>"#
+                .to_string()
+            )
+            .parse_attributes(),
             {
                 let mut attributes = AttrMap::new();
                 attributes.insert(String::from("id"), String::from("main"));
