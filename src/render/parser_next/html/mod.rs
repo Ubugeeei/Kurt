@@ -125,7 +125,30 @@ impl HTMLParser {
 
 #[cfg(test)]
 mod test {
+    use crate::render::dom::node::NodeType;
+
     use super::*;
+
+    #[test]
+    fn test_parse_nodes() {
+        let mut parser = HTMLParser::new("<div>hello</div>".to_string());
+        let nodes = parser.parse_nodes();
+        assert_eq!(
+            vec![Box::new(Node {
+                node_type: NodeType::Element(Element {
+                    tag_name: String::from("div"),
+                    attributes: AttrMap::new(),
+                }),
+                children: vec![Box::new(Node {
+                    node_type: NodeType::Text(Text {
+                        data: String::from("hello")
+                    }),
+                    children: vec![]
+                })],
+            })],
+            nodes
+        );
+    }
 
     #[test]
     fn test_parse_start_tag() {
