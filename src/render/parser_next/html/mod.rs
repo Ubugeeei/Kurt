@@ -46,6 +46,22 @@ impl HTMLParser {
         self.consume_char('>');
         tag_name
     }
+
+    fn parse_doc_type(&mut self) -> String {
+        self.consume_char('<');
+        self.consume_char('!');
+        self.consume_char('D');
+        self.consume_char('O');
+        self.consume_char('C');
+        self.consume_char('T');
+        self.consume_char('Y');
+        self.consume_char('P');
+        self.consume_char('E');
+        self.consume_whitespace();
+        let doc_type = self.parse_identifier();
+        self.consume_char('>');
+        doc_type
+    }
 }
 
 /// parse attributes
@@ -148,6 +164,14 @@ mod test {
         assert_eq!(
             HTMLParser::new("</div>".to_string()).parse_end_tag(),
             String::from("div"),
+        );
+    }
+
+    #[test]
+    fn test_parse_doc_type() {
+        assert_eq!(
+            HTMLParser::new("<!DOCTYPE html>".to_string()).parse_doc_type(),
+            String::from("html"),
         );
     }
 
