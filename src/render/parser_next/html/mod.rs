@@ -45,7 +45,6 @@ impl HTMLParser {
                     }
                     '!' => {
                         let _ = self.parse_doc_type(); // NOTE: skip doc type
-                        return nodes;
                     }
                     _ => {
                         let (tag_name, attributes) = self.parse_start_tag();
@@ -96,6 +95,7 @@ impl HTMLParser {
         self.consume_whitespace();
         let doc_type = self.parse_identifier();
         self.consume_char('>');
+        self.consume_whitespace();
         doc_type
     }
 }
@@ -187,9 +187,8 @@ mod test {
 
     #[test]
     fn test_parse_nodes() {
-        let mut parser = HTMLParser::new("<div>hello</div>".to_string());
-        let nodes = parser.parse_nodes();
         assert_eq!(
+            HTMLParser::new("<div>hello</div>".to_string()).parse_nodes(),
             vec![Box::new(Node {
                 node_type: NodeType::Element(Element {
                     tag_name: String::from("div"),
@@ -202,7 +201,28 @@ mod test {
                     children: vec![]
                 })],
             })],
-            nodes
+        );
+
+        // skip doc type
+        assert_eq!(
+            HTMLParser::new(
+                r#"<!DOCTYPE html>
+<div>hello</div>"#
+                    .to_string()
+            )
+            .parse_nodes(),
+            vec![Box::new(Node {
+                node_type: NodeType::Element(Element {
+                    tag_name: String::from("div"),
+                    attributes: AttrMap::new(),
+                }),
+                children: vec![Box::new(Node {
+                    node_type: NodeType::Text(Text {
+                        data: String::from("hello")
+                    }),
+                    children: vec![]
+                })],
+            })],
         );
     }
 
