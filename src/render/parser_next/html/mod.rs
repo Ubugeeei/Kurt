@@ -21,6 +21,7 @@ impl HTMLParser {
     fn parse_start_tag(&mut self) -> (String, AttrMap) {
         self.consume_char('<');
         let tag_name = self.parse_identifier();
+        self.consume_whitespace();
         let attributes = self.parse_attributes();
         self.consume_char('>');
         (tag_name, attributes)
@@ -28,7 +29,6 @@ impl HTMLParser {
 
     fn parse_attributes(&mut self) -> AttrMap {
         let mut attributes = AttrMap::new();
-        self.consume_whitespace();
         while self.current_char != '>' {
             let (name, value) = self.parse_attribute();
             attributes.insert(name, value);
@@ -99,6 +99,24 @@ mod test {
         assert_eq!(
             HTMLParser::new("<div id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
                 .parse_start_tag(),
+            (String::from("div"), {
+                let mut attributes = AttrMap::new();
+                attributes.insert(String::from("id"), String::from("main"));
+                attributes.insert(String::from("class"), String::from("mt-1 pa-2 text-input"));
+                attributes
+            }),
+        );
+
+        // includes whitespace
+        assert_eq!(
+            HTMLParser::new(
+                r#"<div
+    id="main"
+    class="mt-1 pa-2 text-input"
+>"#
+                .to_string()
+            )
+            .parse_start_tag(),
             (String::from("div"), {
                 let mut attributes = AttrMap::new();
                 attributes.insert(String::from("id"), String::from("main"));
