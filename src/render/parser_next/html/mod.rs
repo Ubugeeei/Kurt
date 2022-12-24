@@ -41,7 +41,7 @@ impl HTMLParser {
                 '<' => match self.peek_char() {
                     '/' => {
                         let _tag_name = self.parse_identifier();
-                        return nodes;
+                        break;
                     }
                     '!' => {
                         let _ = self.parse_doc_type(); // NOTE: skip doc type
@@ -222,6 +222,141 @@ mod test {
                     }),
                     children: vec![]
                 })],
+            })],
+        );
+
+        // complex html
+        assert_eq!(
+            HTMLParser::new(
+                r#"<!DOCTYPE html>
+<html>
+<head>
+  <title>hello</title>
+</head>
+<body>
+  <div class="content pa-2">hello</div>
+</body>
+<script>
+  console.log("hello");
+</script>
+</html>"#
+                    .to_string()
+            )
+            .parse_nodes(),
+            vec![Box::new(Node {
+                node_type: NodeType::Element(Element {
+                    tag_name: String::from("html"),
+                    attributes: AttrMap::new(),
+                }),
+                children: vec![
+                    Box::new(Node {
+                        node_type: NodeType::Text(Text {
+                            data: String::from("\n")
+                        }),
+                        children: vec![]
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Element(Element {
+                            tag_name: String::from("head"),
+                            attributes: AttrMap::new(),
+                        }),
+                        children: vec![
+                            Box::new(Node {
+                                node_type: NodeType::Text(Text {
+                                    data: String::from("\n  ")
+                                }),
+                                children: vec![]
+                            }),
+                            Box::new(Node {
+                                node_type: NodeType::Element(Element {
+                                    tag_name: String::from("title"),
+                                    attributes: AttrMap::new(),
+                                }),
+                                children: vec![Box::new(Node {
+                                    node_type: NodeType::Text(Text {
+                                        data: String::from("hello")
+                                    }),
+                                    children: vec![]
+                                })],
+                            }),
+                            Box::new(Node {
+                                node_type: NodeType::Text(Text {
+                                    data: String::from("\n")
+                                }),
+                                children: vec![]
+                            }),
+                        ],
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Text(Text {
+                            data: String::from("\n")
+                        }),
+                        children: vec![]
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Element(Element {
+                            tag_name: String::from("body"),
+                            attributes: AttrMap::new(),
+                        }),
+                        children: vec![
+                            Box::new(Node {
+                                node_type: NodeType::Text(Text {
+                                    data: String::from("  \n")
+                                }),
+                                children: vec![]
+                            }),
+                            Box::new(Node {
+                                node_type: NodeType::Element(Element {
+                                    tag_name: String::from("div"),
+                                    attributes: {
+                                        let mut attr = AttrMap::new();
+                                        attr.insert(
+                                            String::from("class"),
+                                            String::from("content pa-2"),
+                                        );
+                                        attr
+                                    },
+                                }),
+                                children: vec![Box::new(Node {
+                                    node_type: NodeType::Text(Text {
+                                        data: String::from("hello")
+                                    }),
+                                    children: vec![]
+                                })],
+                            }),
+                            Box::new(Node {
+                                node_type: NodeType::Text(Text {
+                                    data: String::from("\n")
+                                }),
+                                children: vec![]
+                            }),
+                        ],
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Text(Text {
+                            data: String::from("\n")
+                        }),
+                        children: vec![]
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Element(Element {
+                            tag_name: String::from("script"),
+                            attributes: AttrMap::new(),
+                        }),
+                        children: vec![Box::new(Node {
+                            node_type: NodeType::Text(Text {
+                                data: String::from("\n  console.log(\"hello\");\n")
+                            }),
+                            children: vec![]
+                        })],
+                    }),
+                    Box::new(Node {
+                        node_type: NodeType::Text(Text {
+                            data: String::from("\n")
+                        }),
+                        children: vec![]
+                    }),
+                ],
             })],
         );
     }
