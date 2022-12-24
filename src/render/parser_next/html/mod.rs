@@ -73,5 +73,11 @@ mod test {
             (String::from("id"), String::from("main")),
             HTMLParser::new("id=\"main\"".to_string()).parse_attribute()
         );
+
+        // many values
+        assert_eq!(
+            (String::from("class"), String::from("mt-1 pa-2 text-input")),
+            HTMLParser::new("class=\"mt-1 pa-2 text-input\"".to_string()).parse_attribute()
+        );
     }
 }
