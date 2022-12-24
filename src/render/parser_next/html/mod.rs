@@ -20,11 +20,11 @@ impl HTMLParser {
 
     fn parse_attributes(&mut self) -> AttrMap {
         let mut attributes = AttrMap::new();
-        // while self.current_char != '>' {
-        //     self.consume_whitespace();
-        //     let (name, value) = self.parse_attribute();
-        //     attributes.insert(name, value);
-        // }
+        while self.current_char != '>' {
+            self.consume_whitespace();
+            let (name, value) = self.parse_attribute();
+            attributes.insert(name, value);
+        }
         attributes
     }
 
@@ -88,7 +88,7 @@ mod test {
     #[test]
     fn test_parse_attributes() {
         assert_eq!(
-            HTMLParser::new("id=\"main\" class=\"mt-1 pa-2 text-input\"".to_string())
+            HTMLParser::new("id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
                 .parse_attributes(),
             {
                 let mut attributes = AttrMap::new();
