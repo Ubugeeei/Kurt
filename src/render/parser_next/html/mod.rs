@@ -1,3 +1,5 @@
+use crate::render::dom::element::AttrMap;
+
 pub struct HTMLParser {
     input: String,
     position: usize,
@@ -14,6 +16,16 @@ impl HTMLParser {
             chars: chars.clone(),
             current_char: chars[0],
         }
+    }
+
+    fn parse_attributes(&mut self) -> AttrMap {
+        let mut attributes = AttrMap::new();
+        // while self.current_char != '>' {
+        //     self.consume_whitespace();
+        //     let (name, value) = self.parse_attribute();
+        //     attributes.insert(name, value);
+        // }
+        attributes
     }
 
     fn parse_attribute(&mut self) -> (String, String) {
@@ -72,6 +84,20 @@ impl HTMLParser {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_parse_attributes() {
+        assert_eq!(
+            HTMLParser::new("id=\"main\" class=\"mt-1 pa-2 text-input\"".to_string())
+                .parse_attributes(),
+            {
+                let mut attributes = AttrMap::new();
+                attributes.insert(String::from("id"), String::from("main"));
+                attributes.insert(String::from("class"), String::from("mt-1 pa-2 text-input"));
+                attributes
+            },
+        );
+    }
 
     #[test]
     fn test_parse_attribute() {
