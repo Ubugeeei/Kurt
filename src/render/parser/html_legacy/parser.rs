@@ -1,5 +1,7 @@
 //! This module includes some implementations on HTML.
 
+#![allow(dead_code)]
+
 use super::{
     super::super::dom::{chardata::Text, element::Element, node::Node},
     tag::{close_tag, open_tag},

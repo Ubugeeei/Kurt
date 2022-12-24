@@ -9,7 +9,8 @@ use crate::{
             node::{Node, NodeType},
         },
         layout::create_layout_document,
-        parser::{css::stylesheet::parse_css, html::parser::parse_html},
+        parser::css::stylesheet::parse_css,
+        parser_next::html::HTMLParser,
         styled_node::create_styled_document,
     },
 };
@@ -41,13 +42,13 @@ pub fn render_by_url(url: &str, scrolled_window: &gtk::ScrolledWindow, _refresh_
         } else {
             println!("{}", html);
         }
-        render_document(&html, &document_container);
+        render_document(&html, &url, &document_container);
         // refresh_btn.set_icon_name("view-refresh"); // FIXME: not working!
     }
 }
 
-pub fn render_document(html: &str, main_container: &gtk::Box) {
-    let document = parse_html(&html).unwrap();
+pub fn render_document(html: &str, url: &str, main_container: &gtk::Box) {
+    let document = HTMLParser::new(html.to_string()).parse(url.to_string());
     println!("---------------------------------------------------------");
     println!("[\x1b[32mParse Document\x1b[0m]");
     println!("---------------------------------------------------------");

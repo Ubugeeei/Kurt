@@ -1,4 +1,4 @@
-pub mod html;
+pub mod html_legacy;
 
 pub mod css;
 use self::css::*;
