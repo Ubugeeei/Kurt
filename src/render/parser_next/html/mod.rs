@@ -27,6 +27,14 @@ impl HTMLParser {
         (tag_name, attributes)
     }
 
+    fn parse_end_tag(&mut self) -> String {
+        self.consume_char('<');
+        self.consume_char('/');
+        let tag_name = self.parse_identifier();
+        self.consume_char('>');
+        tag_name
+    }
+
     fn parse_attributes(&mut self) -> AttrMap {
         let mut attributes = AttrMap::new();
         while self.current_char != '>' {
@@ -97,7 +105,7 @@ mod test {
     #[test]
     fn test_parse_start_tag() {
         assert_eq!(
-            HTMLParser::new("<div id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
+            HTMLParser::new("< id=\"main\" class=\"mt-1 pa-2 text-input\">".to_string())
                 .parse_start_tag(),
             (String::from("div"), {
                 let mut attributes = AttrMap::new();
@@ -123,6 +131,14 @@ mod test {
                 attributes.insert(String::from("class"), String::from("mt-1 pa-2 text-input"));
                 attributes
             }),
+        );
+    }
+
+    #[test]
+    fn test_parse_end_tag() {
+        assert_eq!(
+            HTMLParser::new("</div>".to_string()).parse_end_tag(),
+            String::from("div"),
         );
     }
 
